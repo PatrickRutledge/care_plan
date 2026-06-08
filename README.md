@@ -10,11 +10,20 @@ so the process **survives changes to the critical path**. The core idea:
 > **data state machine** and the **information contract** instead of the screens,
 > and re-sequencing the path can no longer break it.
 
+## Design sequence (important)
+
+The **clinically-correct process is defined first**, anchored to HL7 data; a
+vendor (Athena) is mapped in **last**, as an implementation target — never the
+source of the design. See [`clinical-process.md`](clinical-process.md) for the
+governing care-planning cycle and the *intentional direction of services* that
+every workflow realizes.
+
 ## What's here
 
 | File | What it gives you |
 |---|---|
-| [`process-map.md`](process-map.md) | BPMN-style swimlane spec. Each step names its data object + state transition. **Start here.** |
+| [`clinical-process.md`](clinical-process.md) | **The spine.** The clinical care-planning cycle, the temporal dependency graph, and the goal→service→evaluation intent. **Start here.** |
+| [`process-map.md`](process-map.md) | BPMN-style swimlane spec. Each step names its data object + state transition. |
 | [`state-machine.md`](state-machine.md) | Mermaid diagrams of the `moodCode` / `statusCode` state machine (renders on GitHub). |
 | [`careplan-example.xml`](careplan-example.xml) | A concrete, **schema-valid** CDA Care Plan instance: 1 goal, 1 internal task, 1 external task, 1 completion event. |
 | [`careplan-example.rendered.html`](careplan-example.rendered.html) | The CDA instance run through the HL7 CDA stylesheet — the human-readable, attestable view. Open in a browser. |
