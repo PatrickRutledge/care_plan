@@ -1,0 +1,163 @@
+{
+  "resourceType": "Bundle",
+  "id": "careplan-bundle-0001",
+  "type": "transaction",
+  "_comment": "FHIR R4 mirror of careplan-example.xml. SAME data atoms, mapped to FHIR workflow resources. CDA is the legal snapshot; this is the live-workflow representation. See cda-to-fhir-mapping.md.",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:patient-jane",
+      "request": { "method": "PUT", "url": "Patient/PT-12345" },
+      "resource": {
+        "resourceType": "Patient",
+        "id": "PT-12345",
+        "identifier": [
+          { "system": "urn:oid:2.16.840.1.113883.19.5.99999.2", "value": "PT-12345" }
+        ],
+        "name": [ { "family": "Patient", "given": [ "Jane" ] } ],
+        "gender": "female",
+        "birthDate": "1960-01-01"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:org-internal",
+      "request": { "method": "PUT", "url": "Organization/OUR-ORG" },
+      "resource": {
+        "resourceType": "Organization",
+        "id": "OUR-ORG",
+        "identifier": [ { "system": "urn:oid:2.16.840.1.113883.19.5.99999", "value": "OUR-ORG" } ],
+        "name": "Internal Primary Care Clinic"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:org-external",
+      "request": { "method": "PUT", "url": "Organization/OTHER-ORG" },
+      "resource": {
+        "resourceType": "Organization",
+        "id": "OTHER-ORG",
+        "identifier": [ { "system": "urn:oid:2.16.840.1.113883.19.5.88888", "value": "OTHER-ORG" } ],
+        "name": "External Eye Specialists Group"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:prac-rn",
+      "request": { "method": "PUT", "url": "Practitioner/RN-7" },
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "RN-7",
+        "identifier": [ { "system": "urn:oid:2.16.840.1.113883.19.5.99999.3", "value": "RN-7" } ],
+        "name": [ { "family": "Nurse", "given": [ "Nora" ] } ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:prac-eye",
+      "request": { "method": "PUT", "url": "Practitioner/MD-EYE-2" },
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "MD-EYE-2",
+        "identifier": [ { "system": "urn:oid:2.16.840.1.113883.19.5.88888.3", "value": "MD-EYE-2" } ],
+        "name": [ { "family": "Ophthal", "given": [ "Owen" ] } ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:careteam",
+      "request": { "method": "PUT", "url": "CareTeam/CT-1" },
+      "resource": {
+        "resourceType": "CareTeam",
+        "id": "CT-1",
+        "status": "active",
+        "subject": { "reference": "Patient/PT-12345" },
+        "_comment": "Internal vs external falls out of each member's organization, exactly as in CDA representedOrganization.",
+        "participant": [
+          {
+            "role": [ { "text": "Internal RN (performer)" } ],
+            "member": { "reference": "Practitioner/RN-7" },
+            "onBehalfOf": { "reference": "Organization/OUR-ORG" }
+          },
+          {
+            "role": [ { "text": "External ophthalmologist (referred-to performer)" } ],
+            "member": { "reference": "Practitioner/MD-EYE-2" },
+            "onBehalfOf": { "reference": "Organization/OTHER-ORG" }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:goal-g1",
+      "request": { "method": "PUT", "url": "Goal/G1" },
+      "resource": {
+        "resourceType": "Goal",
+        "id": "G1",
+        "_comment": "CDA observation moodCode=GOL  ->  FHIR Goal. statusCode=active -> lifecycleStatus=active.",
+        "lifecycleStatus": "active",
+        "description": { "text": "Lower A1c to below 7.0% within 6 months" },
+        "subject": { "reference": "Patient/PT-12345" },
+        "target": [
+          {
+            "measure": { "coding": [ { "system": "http://loinc.org", "code": "4548-4", "display": "Hemoglobin A1c" } ] },
+            "detailQuantity": { "value": 7.0, "unit": "%", "comparator": "<" },
+            "dueDate": "2026-12-08"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:careplan",
+      "request": { "method": "PUT", "url": "CarePlan/CarePlan-0001" },
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "CarePlan-0001",
+        "_comment": "CDA ClinicalDocument (Care Plan) -> FHIR CarePlan. The plan references its goal; tasks reference the plan via basedOn.",
+        "identifier": [ { "system": "urn:oid:2.16.840.1.113883.19.5.99999.1", "value": "CarePlan-0001" } ],
+        "status": "active",
+        "intent": "plan",
+        "title": "Care Plan - Jane Q. Patient",
+        "subject": { "reference": "Patient/PT-12345" },
+        "created": "2026-06-08T10:00:00-05:00",
+        "author": { "reference": "Practitioner/RN-7" },
+        "careTeam": [ { "reference": "CareTeam/CT-1" } ],
+        "goal": [ { "reference": "Goal/G1" } ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:task-t1",
+      "request": { "method": "PUT", "url": "Task/T1" },
+      "resource": {
+        "resourceType": "Task",
+        "id": "T1",
+        "_comment": "INTERNAL task. CDA act moodCode=RQO -> Task intent=order. COMPLETED: in CDA a separate EVN act + inFulfillmentOf; in FHIR the same Task simply advances status to completed (the id is the thread).",
+        "identifier": [ { "system": "urn:oid:2.16.840.1.113883.19.5.99999.20", "value": "T1" } ],
+        "basedOn": [ { "reference": "CarePlan/CarePlan-0001" } ],
+        "status": "completed",
+        "intent": "order",
+        "priority": "routine",
+        "code": { "coding": [ { "system": "http://snomed.info/sct", "code": "409063005", "display": "Counselling" } ], "text": "Diabetes self-management education visit" },
+        "for": { "reference": "Patient/PT-12345" },
+        "owner": { "reference": "Practitioner/RN-7" },
+        "requester": { "reference": "Practitioner/RN-7" },
+        "reasonReference": { "reference": "Goal/G1" },
+        "executionPeriod": { "start": "2026-06-10", "end": "2026-06-12T14:30:00-05:00" },
+        "lastModified": "2026-06-12T14:30:00-05:00"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:task-t2",
+      "request": { "method": "PUT", "url": "Task/T2" },
+      "resource": {
+        "resourceType": "Task",
+        "id": "T2",
+        "_comment": "EXTERNAL task. Identical shape to T1; only owner/onBehalfOf org differs (OTHER-ORG) - mirrors CDA representedOrganization. Still open -> status=requested.",
+        "identifier": [ { "system": "urn:oid:2.16.840.1.113883.19.5.99999.20", "value": "T2" } ],
+        "basedOn": [ { "reference": "CarePlan/CarePlan-0001" } ],
+        "status": "requested",
+        "intent": "order",
+        "priority": "routine",
+        "code": { "coding": [ { "system": "http://snomed.info/sct", "code": "410451008", "display": "Eye examination" } ], "text": "Diabetic retinal eye examination" },
+        "for": { "reference": "Patient/PT-12345" },
+        "owner": { "reference": "Practitioner/MD-EYE-2" },
+        "requester": { "reference": "Practitioner/RN-7" },
+        "reasonReference": { "reference": "Goal/G1" },
+        "restriction": { "period": { "start": "2026-06-10", "end": "2026-07-10" } }
+      }
+    }
+  ]
+}

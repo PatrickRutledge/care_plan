@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  SAMPLE CDA R2.0 CARE PLAN  (reference instance, not for clinical use)
+  ============================================================================
+  Purpose: a concrete, validatable artifact your business-process map maps onto.
+
+  It demonstrates the "stable spine" discussed in care-plan-workflow/README.md:
+    - 1 GOAL          observation moodCode="GOL"
+    - 1 INTERNAL task act         moodCode="RQO"  (performer org = OUR-ORG)
+    - 1 EXTERNAL task act         moodCode="RQO"  (performer org = OTHER-ORG)
+    - 1 COMPLETION    act         moodCode="EVN"  statusCode="completed"
+                                  + inFulfillmentOf -> the internal task order
+
+  The INVARIANTS (these survive any UI / click / path change):
+    * each task has a stable  id  (the thread)
+    * task lifecycle rides on moodCode (RQO -> EVN) and statusCode
+    * completion reconciles to its order via  sdtc:inFulfillmentOf1
+    * goal<->task linkage via  entryRelationship typeCode="REFR"
+    * internal vs. external is ONLY the representedOrganization behind performer
+  ============================================================================
+-->
+<ClinicalDocument xmlns="urn:hl7-org:v3"
+                  xmlns:sdtc="urn:hl7-org:sdtc"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <realmCode code="US"/>
+  <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
+  <!-- C-CDA Care Plan document template (informative pointer; this repo is base CDA) -->
+  <templateId root="2.16.840.1.113883.10.20.22.1.15" extension="2015-08-01"/>
+  <id root="2.16.840.1.113883.19.5.99999.1" extension="CarePlan-0001"/>
+  <code code="18776-5" codeSystem="2.16.840.1.113883.6.1"
+        codeSystemName="LOINC" displayName="Plan of care note"/>
+  <title>Care Plan - Jane Q. Patient</title>
+  <effectiveTime value="20260608100000-0500"/>
+  <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
+  <languageCode code="en-US"/>
+
+  <!-- WHO IT IS FOR  (subject of every task below) -->
+  <recordTarget>
+    <patientRole>
+      <id root="2.16.840.1.113883.19.5.99999.2" extension="PT-12345"/>
+      <patient>
+        <name><given>Jane</given><family>Patient</family></name>
+        <administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"/>
+        <birthTime value="19600101"/>
+      </patient>
+    </patientRole>
+  </recordTarget>
+
+  <!-- WHO RECORDED THE PLAN (provenance) -->
+  <author>
+    <time value="20260608100000-0500"/>
+    <assignedAuthor>
+      <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+      <assignedPerson>
+        <name><given>Alan</given><family>Author</family></name>
+      </assignedPerson>
+      <representedOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+        <name>Internal Primary Care Clinic</name>
+      </representedOrganization>
+    </assignedAuthor>
+  </author>
+
+  <custodian>
+    <assignedCustodian>
+      <representedCustodianOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+        <name>Internal Primary Care Clinic</name>
+      </representedCustodianOrganization>
+    </assignedCustodian>
+  </custodian>
+
+  <!-- THE SIGN-OFF / ATTESTATION GATE (a workflow step expressed as data) -->
+  <legalAuthenticator>
+    <time value="20260608101500-0500"/>
+    <signatureCode code="S"/>
+    <assignedEntity>
+      <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+      <representedOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+      </representedOrganization>
+    </assignedEntity>
+  </legalAuthenticator>
+
+  <component>
+    <structuredBody>
+
+      <!-- ================= GOALS SECTION ================= -->
+      <component>
+        <section>
+          <code code="61146-7" codeSystem="2.16.840.1.113883.6.1"
+                displayName="Goals"/>
+          <title>Goals</title>
+          <text>Lower A1c to below 7.0% within 6 months.</text>
+
+          <!-- GOAL: observation in GOL mood. id=G1 is the anchor tasks point at. -->
+          <entry>
+            <observation classCode="OBS" moodCode="GOL">
+              <id root="2.16.840.1.113883.19.5.99999.10" extension="G1"/>
+              <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                    displayName="Hemoglobin A1c"/>
+              <statusCode code="active"/>
+              <effectiveTime>
+                <low value="20260608"/>
+                <high value="20261208"/>
+              </effectiveTime>
+              <value xsi:type="PQ" value="7.0" unit="%"/>
+            </observation>
+          </entry>
+        </section>
+      </component>
+
+      <!-- ================= PLAN OF TREATMENT / TASKS ================= -->
+      <component>
+        <section>
+          <code code="18776-5" codeSystem="2.16.840.1.113883.6.1"
+                displayName="Plan of care note"/>
+          <title>Planned Tasks</title>
+          <text>
+            Task T1 (internal): diabetes education visit - owner: internal RN.
+            Task T2 (external): retinal eye exam - owner: external ophthalmology.
+          </text>
+
+          <!-- ===== TASK T1: INTERNAL =====
+               act moodCode="RQO" (a request/order = an assigned task)
+               performer org = OUR-ORG  -> this is what makes it "internal" -->
+          <entry>
+            <act classCode="ACT" moodCode="RQO">
+              <id root="2.16.840.1.113883.19.5.99999.20" extension="T1"/>
+              <code code="409063005" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Counselling"/>
+              <text>Diabetes self-management education visit</text>
+              <statusCode code="active"/>
+              <effectiveTime>
+                <low value="20260610"/>
+                <high value="20260624"/>   <!-- due window -->
+              </effectiveTime>
+              <priorityCode code="R" codeSystem="2.16.840.1.113883.5.7"
+                            displayName="routine"/>
+
+              <!-- WHO DOES IT (internal). performer typeCode PRF = performer -->
+              <performer typeCode="PRF">
+                <assignedEntity>
+                  <id root="2.16.840.1.113883.19.5.99999.3" extension="RN-7"/>
+                  <assignedPerson>
+                    <name><given>Nora</given><family>Nurse</family></name>
+                  </assignedPerson>
+                  <representedOrganization>
+                    <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+                    <name>Internal Primary Care Clinic</name>
+                  </representedOrganization>
+                </assignedEntity>
+              </performer>
+
+              <!-- LINK TASK -> GOAL (REFR = refers to) -->
+              <entryRelationship typeCode="REFR">
+                <observation classCode="OBS" moodCode="GOL">
+                  <id root="2.16.840.1.113883.19.5.99999.10" extension="G1"/>
+                  <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                        displayName="Hemoglobin A1c"/>
+                </observation>
+              </entryRelationship>
+            </act>
+          </entry>
+
+          <!-- ===== TASK T2: EXTERNAL =====
+               IDENTICAL structure to T1. The ONLY difference that makes it
+               "external" is representedOrganization = OTHER-ORG (+ id namespace).
+               No special "external task" type is needed. -->
+          <entry>
+            <act classCode="ACT" moodCode="RQO">
+              <id root="2.16.840.1.113883.19.5.99999.20" extension="T2"/>
+              <code code="410451008" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Eye examination"/>
+              <text>Diabetic retinal eye examination</text>
+              <statusCode code="active"/>
+              <effectiveTime>
+                <low value="20260610"/>
+                <high value="20260710"/>
+              </effectiveTime>
+              <priorityCode code="R" codeSystem="2.16.840.1.113883.5.7"
+                            displayName="routine"/>
+
+              <!-- WHO DOES IT (external) -->
+              <performer typeCode="PRF">
+                <assignedEntity>
+                  <id root="2.16.840.1.113883.19.5.88888.3" extension="MD-EYE-2"/>
+                  <assignedPerson>
+                    <name><given>Owen</given><family>Ophthal</family></name>
+                  </assignedPerson>
+                  <representedOrganization>
+                    <id root="2.16.840.1.113883.19.5.88888" extension="OTHER-ORG"/>
+                    <name>External Eye Specialists Group</name>
+                  </representedOrganization>
+                </assignedEntity>
+              </performer>
+
+              <!-- referred-to party (referral semantics) -->
+              <participant typeCode="REFT">
+                <participantRole classCode="ROL">
+                  <id root="2.16.840.1.113883.19.5.88888" extension="OTHER-ORG"/>
+                  <scopingEntity>
+                    <id root="2.16.840.1.113883.19.5.88888" extension="OTHER-ORG"/>
+                  </scopingEntity>
+                </participantRole>
+              </participant>
+
+              <!-- callback contact, for the external org to reach us -->
+              <participant typeCode="CALLBCK">
+                <participantRole classCode="ROL">
+                  <id root="2.16.840.1.113883.19.5.99999.3" extension="RN-7"/>
+                </participantRole>
+              </participant>
+
+              <entryRelationship typeCode="REFR">
+                <observation classCode="OBS" moodCode="GOL">
+                  <id root="2.16.840.1.113883.19.5.99999.10" extension="G1"/>
+                  <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                        displayName="Hemoglobin A1c"/>
+                </observation>
+              </entryRelationship>
+            </act>
+          </entry>
+
+          <!-- ===== COMPLETION OF TASK T1 =====
+               WORKFLOW 2: completing a task is a NEW act in EVN mood,
+               statusCode="completed", that reconciles to the order T1
+               via sdtc:inFulfillmentOf1. Whoever/whatever produced this,
+               it ties back to the order by id - path-independent. -->
+          <entry>
+            <act classCode="ACT" moodCode="EVN">
+              <id root="2.16.840.1.113883.19.5.99999.21" extension="T1-DONE"/>
+              <code code="409063005" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Counselling"/>
+              <text>Diabetes education visit completed</text>
+              <statusCode code="completed"/>
+              <effectiveTime value="20260612143000-0500"/>  <!-- when actually done -->
+
+              <!-- WHO ACTUALLY DID IT -->
+              <performer typeCode="PRF">
+                <assignedEntity>
+                  <id root="2.16.840.1.113883.19.5.99999.3" extension="RN-7"/>
+                  <representedOrganization>
+                    <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+                  </representedOrganization>
+                </assignedEntity>
+              </performer>
+
+              <!-- progress rolls up to the goal -->
+              <entryRelationship typeCode="REFR">
+                <observation classCode="OBS" moodCode="GOL">
+                  <id root="2.16.840.1.113883.19.5.99999.10" extension="G1"/>
+                  <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                        displayName="Hemoglobin A1c"/>
+                </observation>
+              </entryRelationship>
+
+              <!-- THE FULFILLMENT LINK: this event fulfills order T1.
+                   Per the Act content model this is the LAST child element. -->
+              <sdtc:inFulfillmentOf1 typeCode="FLFS">
+                <sdtc:templateId root="2.16.840.1.113883.10.20.1.43"/>
+                <sdtc:actReference classCode="ACT" moodCode="RQO">
+                  <sdtc:id root="2.16.840.1.113883.19.5.99999.20" extension="T1"/>
+                </sdtc:actReference>
+              </sdtc:inFulfillmentOf1>
+            </act>
+          </entry>
+
+        </section>
+      </component>
+
+    </structuredBody>
+  </component>
+</ClinicalDocument>

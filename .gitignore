@@ -1,0 +1,4 @@
+# Working artifact: unzipped HL7 normative schemas used only for local
+# validation. Re-extract from the CDA-core-2.0 repo's
+# schema/normative/cda_r2_normativewebedition2010.zip when needed.
+.normative-schema/
