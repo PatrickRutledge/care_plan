@@ -131,6 +131,19 @@
               <value xsi:type="CD" code="412776001"
                      codeSystem="2.16.840.1.113883.6.96"
                      displayName="Well controlled"/>
+              <!-- PATIENT'S STATEMENT ABOUT THE GOAL: the patient is the AUTHOR of
+                   the goal (a patient-stated goal). Per C-CDA, a Goal Observation
+                   whose author is the recordTarget (patient) is a patient goal
+                   (Author Participation template 4.119). The patient's role here is
+                   GOAL-EXPRESSER, never a task performer. Roles are not swapped. -->
+              <author typeCode="AUT">
+                <templateId root="2.16.840.1.113883.10.20.22.4.119"/>
+                <time value="20260608"/>
+                <assignedAuthor>
+                  <id root="2.16.840.1.113883.19.5.99999.2" extension="PT-12345"/>
+                  <assignedPerson><name><given>Jane</given><family>Patient</family></name></assignedPerson>
+                </assignedAuthor>
+              </author>
             </observation>
           </entry>
         </section>
@@ -142,8 +155,13 @@
           <code code="18776-5" codeSystem="2.16.840.1.113883.6.1"
                 displayName="Plan of care note"/>
           <title>Tasks</title>
-          <text>Prescribe regimen (provider); schedule appointments (care manager);
-            arrange transportation (care manager, SDOH); attend appointments (patient).</text>
+          <text>This section shows the full space HL7 supports: care-team tasks
+            (prescribe regimen - provider; schedule appointments - care manager;
+            arrange transportation - care manager, SDOH) AND a patient-performed
+            task (attend appointments). The patient also appears as the GOAL AUTHOR
+            above. Whether a given program assigns patient tasks or instead uses
+            only team tasks that support the patient is a local choice - the data
+            model permits all of it.</text>
 
           <!-- TEAM TASK: provider prescribes regimen -->
           <entry>
@@ -227,7 +245,17 @@
             </act>
           </entry>
 
-          <!-- PATIENT-EXPECTED TASK: performer is the PATIENT, not the team -->
+          <!-- PATIENT-AS-PERFORMER: a VALID HL7 possibility, shown because this
+               repo reflects what the standard SUPPORTS, not any one clinic's
+               practice. FHIR R4 explicitly lists Patient (and RelatedPerson) as
+               allowed performers - CarePlan.activity.detail.performer AND
+               Task.owner both include Patient. In CDA it is schema-valid via
+               performer/assignedEntity (assignedEntity is conventionally a
+               provider role, so this is valid-but-less-idiomatic). Roles and
+               credentials are separate variables: the patient role is NOT
+               interchanged with a provider role - it is simply permitted to
+               perform. (A program that instead assigns only care-team tasks that
+               SUPPORT the patient's actions is a local choice, not a model limit.) -->
           <entry>
             <act classCode="ACT" moodCode="RQO">
               <id root="2.16.840.1.113883.19.5.99999.20" extension="T-ATTEND"/>
@@ -236,7 +264,6 @@
               <text>Patient to attend the four scheduled appointments</text>
               <statusCode code="active"/>
               <effectiveTime><low value="20260615"/><high value="20261208"/></effectiveTime>
-              <!-- performer = the PATIENT: an expectation, not a team deliverable -->
               <performer typeCode="PRF">
                 <assignedEntity>
                   <id root="2.16.840.1.113883.19.5.99999.2" extension="PT-12345"/>

@@ -64,14 +64,29 @@ narrative leaned on it.
 
 ---
 
-## 3. QUESTIONABLE — flagged for resolution (not yet fixed)
+## 3. Previously QUESTIONABLE — now reviewed & resolved
 
-1. **Patient as `performer`/`assignedEntity` (goal-model example).** CDA
-   `assignedEntity` implies a *provider* role; modeling the **patient** as a
-   performer is a stretch. FHIR `Task.owner = Patient` **is** explicitly allowed.
-   *Proposed fix:* in CDA, represent patient-expected actions as patient
-   instructions or a patient-authored act, and reserve `performer` for the team;
-   keep `Task.owner = Patient` in FHIR.
+> **Repo-purpose principle (2026-06-09):** this repo reflects **what HL7 makes
+> possible / what exists in the spec**, not what any one clinic does. So a
+> construct that is *valid HL7* stays in — even if a given program wouldn't use
+> it. "We don't do X in our clinic" is never a reason to remove a valid construct;
+> it's a reason to note X as a *local choice* alongside the construct.
+
+1. **Patient as `performer` (goal-model example).** *Status: RESOLVED — kept as a
+   valid HL7 possibility (this repo reflects what the standard SUPPORTS, not one
+   clinic's practice).* Verified 2026-06-09: **FHIR R4 explicitly lists `Patient`
+   (and `RelatedPerson`) as allowed performers** — both `Task.owner` *and*
+   `CarePlan.activity.detail.performer` include `Patient`. In **CDA** it is
+   **schema-valid** via `performer/assignedEntity`; the only caveat is that
+   `assignedEntity` is *conventionally* a provider role, so patient-as-performer
+   is **valid-but-less-idiomatic** in CDA — not invalid. The earlier "stretch /
+   delete it" framing was wrong: we don't narrow the standard to a clinic's habit.
+   The example now demonstrates **both** legitimate patient roles — patient as
+   **goal author** (`Goal.expressedBy` / R5 `Goal.source`; CDA Goal Observation
+   `author` = recordTarget) *and* patient as **performer** of a task — and notes
+   that assigning team-only supporting tasks instead is a *local choice*, not a
+   model limit. Roles/credentials stay separate; the patient role is never
+   interchanged with a provider role.
 
 2. **C-CDA `templateId`s asserted from memory.** Several document- and
    entry-level templateIds (e.g. the Care Plan, Progress Note, Referral Note IDs)
@@ -173,7 +188,7 @@ apart in your head matches the data as it actually is.
 | `REFR` overstatement | ✅ swept — `cda-to-fhir-mapping`, `wf3`, `wf5`, `discovery-summary`, `state-machine` corrected |
 | FHIR per-service→goal linkage | ✅ corrected to plan-level `CarePlan.goal` (R4 cpl-3 + R5 deletion verified); instances updated |
 | `sdtc:inFulfillmentOf1` profile | ✅ softened; `.ccda` set uses Entry Reference |
-| Patient-as-performer | ⬜ flagged, fix proposed (still open) |
+| Patient-as-performer | ✅ resolved — KEPT as a valid HL7 possibility (FHIR explicitly allows Patient performer; CDA schema-valid, less idiomatic). Repo shows what the standard supports, not a clinic's habit. Patient also shown as goal author. |
 | templateIds | ✅ resolved — all five workflows re-anchored to verified C-CDA templateIds |
 | Goal/objective consistency pass (WF1/3/4) | ✅ uniform C-CDA Goal Observation form |
 | External cross-check reconciled | ✅ Copilot + Grok findings verified, applied, or refuted |

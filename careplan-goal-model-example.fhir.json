@@ -56,6 +56,9 @@
         "category": [ { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/goal-category", "code": "treatment" } ] } ],
         "description": { "coding": [ { "system": "http://snomed.info/sct", "code": "412776001", "display": "Well controlled" } ], "text": "Diabetes well-controlled" },
         "subject": { "reference": "Patient/PT-12345" },
+        "_comment_expressedBy": "PATIENT'S STATEMENT ABOUT THE GOAL: expressedBy = Patient marks this as a patient-stated goal (the patient is the goal-EXPRESSER, a distinct role from performer). R4 element is Goal.expressedBy; RENAMED to Goal.source in R5. note carries the patient's own words.",
+        "expressedBy": { "reference": "Patient/PT-12345" },
+        "note": [ { "text": "Patient: \"I want to keep my diabetes under control so I can keep up with my grandkids.\"" } ],
         "addresses": [ { "reference": "Condition/PROB-1", "display": "Type 2 diabetes mellitus" } ],
         "target": [
           {
