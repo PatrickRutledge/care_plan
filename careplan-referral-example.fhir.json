@@ -1,0 +1,94 @@
+{
+  "resourceType": "Bundle",
+  "id": "careplan-referral-bundle",
+  "type": "transaction",
+  "_comment": "FHIR R4 mirror of careplan-referral-example.xml (WF5: external referral / closed-loop hand-off). The referral maps to ServiceRequest; the external org is an Organization performer; loop closure is a Task basedOn the ServiceRequest with an output DocumentReference. Assumes base resources (Patient, Goal G1) from earlier bundles exist.",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:org-community",
+      "request": { "method": "PUT", "url": "Organization/COMMUNITY-ORG" },
+      "resource": {
+        "resourceType": "Organization",
+        "id": "COMMUNITY-ORG",
+        "_comment": "External team member = an Organization outside our own. Same role as any performer org; only the boundary differs. This is the CHI/community-based organization.",
+        "identifier": [ { "system": "urn:oid:2.16.840.1.113883.19.5.77777", "value": "COMMUNITY-ORG" } ],
+        "type": [ { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/organization-type", "code": "other", "display": "Community-based organization" } ] } ],
+        "name": "Community Health Partners (CHI)"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:cond-sdoh",
+      "request": { "method": "PUT", "url": "Condition/SDOH-1" },
+      "resource": {
+        "resourceType": "Condition",
+        "id": "SDOH-1",
+        "_comment": "The barrier: a health-related social need. CDA SDOH observation -> FHIR Condition (category health-concern). Food insecurity, Z59.41.",
+        "clinicalStatus": { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/condition-clinical", "code": "active" } ] },
+        "category": [ { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/condition-category", "code": "health-concern", "display": "Health Concern" } ] } ],
+        "code": { "coding": [
+          { "system": "http://snomed.info/sct", "code": "733423003", "display": "Food insecurity" },
+          { "system": "http://hl7.org/fhir/sid/icd-10-cm", "code": "Z59.41", "display": "Food insecurity" }
+        ] },
+        "subject": { "reference": "Patient/PT-12345" },
+        "recordedDate": "2026-06-15"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:sr-referral",
+      "request": { "method": "PUT", "url": "ServiceRequest/REF-1" },
+      "resource": {
+        "resourceType": "ServiceRequest",
+        "id": "REF-1",
+        "_comment": "The referral. CDA act moodCode=RQO (referral) -> FHIR ServiceRequest intent=order. requester=referred-by (internal); performer=referred-to (external org). reasonReference=the social need. basedOn the CarePlan that carries goal G1 (the goal it serves).",
+        "identifier": [ { "system": "urn:oid:2.16.840.1.113883.19.5.99999.20", "value": "REF-1" } ],
+        "status": "active",
+        "intent": "order",
+        "priority": "routine",
+        "code": { "coding": [ { "system": "http://snomed.info/sct", "code": "3457005", "display": "Patient referral" } ], "text": "Referral to Community Health Integration for food insecurity" },
+        "subject": { "reference": "Patient/PT-12345" },
+        "basedOn": [ { "reference": "CarePlan/CarePlan-0001" } ],
+        "requester": { "reference": "Practitioner/DR-1" },
+        "performer": [ { "reference": "Organization/COMMUNITY-ORG" } ],
+        "reasonReference": [ { "reference": "Condition/SDOH-1", "display": "Food insecurity" } ],
+        "supportingInfo": [ { "reference": "Goal/G1", "display": "A1c < 7.0% (goal served by removing barrier)" } ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:docref-chi",
+      "request": { "method": "PUT", "url": "DocumentReference/CHIDOC-1" },
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "CHIDOC-1",
+        "_comment": "The external program's report. CDA reference->externalDocument -> FHIR DocumentReference.",
+        "status": "current",
+        "type": { "coding": [ { "system": "http://loinc.org", "code": "57133-1", "display": "Referral note" } ] },
+        "subject": { "reference": "Patient/PT-12345" },
+        "author": [ { "reference": "Organization/COMMUNITY-ORG" } ],
+        "description": "Community Health Integration outcome report"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:task-closeloop",
+      "request": { "method": "PUT", "url": "Task/REF-1-FULFILL" },
+      "resource": {
+        "resourceType": "Task",
+        "id": "REF-1-FULFILL",
+        "_comment": "LOOP CLOSURE. CDA EVN act + sdtc:inFulfillmentOf1 -> FHIR Task whose basedOn is the ServiceRequest. status=completed closes the referral loop; output carries the external report. owner=the external org that did the work.",
+        "status": "completed",
+        "intent": "order",
+        "basedOn": [ { "reference": "ServiceRequest/REF-1" } ],
+        "code": { "coding": [ { "system": "http://hl7.org/fhir/CodeSystem/task-code", "code": "fulfill" } ], "text": "Fulfill referral REF-1" },
+        "for": { "reference": "Patient/PT-12345" },
+        "owner": { "reference": "Organization/COMMUNITY-ORG" },
+        "requester": { "reference": "Practitioner/DR-1" },
+        "lastModified": "2026-06-28",
+        "output": [
+          {
+            "type": { "text": "Outcome report" },
+            "valueReference": { "reference": "DocumentReference/CHIDOC-1" }
+          }
+        ]
+      }
+    }
+  ]
+}

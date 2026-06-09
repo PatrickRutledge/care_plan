@@ -109,13 +109,18 @@ power of anchoring intent in the standard.
 | **WF1 — Establish care plan** | 3 Set goal, 4 Direct services, 5 Implement | ✅ built |
 | **WF2 — Complete tasks** | 5 Implement, 8 Close | ✅ built |
 | **WF3 — Follow-up & evaluate** | 6 Monitor, 7 Evaluate, 8 Revise | ✅ built |
-| **WF5 — Referral / external hand-off** | 4 Direct services (external) | ⬜ remaining |
+| **WF5 — Referral / external hand-off** | 4 Direct services (external) | ✅ built |
 
-**All 8 cycle phases are now realized by at least one workflow.** The discovery
-process is complete end-to-end: assess (WF4) → set goal & direct services (WF1) →
-implement & complete (WF2) → monitor, evaluate, revise (WF3) → loop. WF5 (external
-referral) is a *variant* of phase-4 service direction, not a new phase — it can be
-added when the external-coordination detail is needed.
+**All 8 cycle phases are now realized, and the material is fully exhausted.** The
+discovery process is complete end-to-end: assess (WF4) → set goal & direct
+services (WF1) → implement & complete (WF2) → monitor, evaluate, revise (WF3) →
+loop, with external service direction and closed-loop referral covered by WF5.
+Every workflow has a schema-valid CDA instance, a FHIR mirror, and a process map.
+
+This closes the HL7-material discovery phase. The agreed next phase (a separate
+effort) is **comparison** — reconciling this model against actual clinical
+practice and external frameworks (e.g. CMS, AHRQ). That comparison is deliberately
+deferred so the discovery stands on its own first.
 
 ---
 

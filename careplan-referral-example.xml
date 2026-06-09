@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  SAMPLE CDA R2.0 REFERRAL / EXTERNAL HAND-OFF  (WF5, reference instance)
+  ============================================================================
+  Demonstrates cycle phase 4 (Direct services) in its EXTERNAL variant: a
+  service directed to an external team member / organization, with closed-loop
+  reporting back. Structurally identical to an internal task except the
+  performer's representedOrganization is an outside org.
+
+  The clinical story it encodes:
+    - A health-related social need is identified: food insecurity (a barrier
+      to glycemic control / the A1c goal).
+    - A REFERRAL (act moodCode=RQO) is directed to an external Community Health
+      Integration (CHI) organization to address it.
+    - The referral is justified in data:
+          REFR -> goal G1   (it serves the A1c goal by removing a barrier)
+          RSON -> the social-need observation (the WHY)
+      and routed with referred-by / referred-to participants.
+    - LOOP CLOSURE: the external org reports completion (act moodCode=EVN),
+      inFulfillmentOf the referral, with a reference to their external report.
+
+  Why this is the same machinery, not new machinery:
+    external team member  =  performer whose representedOrganization is outside.
+    closed-loop referral  =  inFulfillmentOf linking the external EVN to the RQO.
+
+  NOTE: clinical codes here are illustrative; the STRUCTURE is the point.
+  ============================================================================
+-->
+<ClinicalDocument xmlns="urn:hl7-org:v3"
+                  xmlns:sdtc="urn:hl7-org:sdtc"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <realmCode code="US"/>
+  <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
+  <templateId root="2.16.840.1.113883.10.20.22.1.14" extension="2015-08-01"/>
+  <id root="2.16.840.1.113883.19.5.99999.1" extension="Referral-0001"/>
+  <code code="57133-1" codeSystem="2.16.840.1.113883.6.1"
+        codeSystemName="LOINC" displayName="Referral note"/>
+  <title>Referral to Community Health Integration - Jane Q. Patient</title>
+  <effectiveTime value="20260615100000-0500"/>
+  <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
+  <languageCode code="en-US"/>
+
+  <recordTarget>
+    <patientRole>
+      <id root="2.16.840.1.113883.19.5.99999.2" extension="PT-12345"/>
+      <patient>
+        <name><given>Jane</given><family>Patient</family></name>
+        <administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"/>
+        <birthTime value="19600101"/>
+      </patient>
+    </patientRole>
+  </recordTarget>
+
+  <author>
+    <time value="20260615100000-0500"/>
+    <assignedAuthor>
+      <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+      <assignedPerson>
+        <name><given>Alan</given><family>Author</family></name>
+      </assignedPerson>
+      <representedOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+        <name>Internal Primary Care Clinic</name>
+      </representedOrganization>
+    </assignedAuthor>
+  </author>
+
+  <custodian>
+    <assignedCustodian>
+      <representedCustodianOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+        <name>Internal Primary Care Clinic</name>
+      </representedCustodianOrganization>
+    </assignedCustodian>
+  </custodian>
+
+  <legalAuthenticator>
+    <time value="20260615101500-0500"/>
+    <signatureCode code="S"/>
+    <assignedEntity>
+      <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+      <representedOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+      </representedOrganization>
+    </assignedEntity>
+  </legalAuthenticator>
+
+  <!-- this referral appends to the existing care plan -->
+  <relatedDocument typeCode="APND">
+    <parentDocument>
+      <id root="2.16.840.1.113883.19.5.99999.1" extension="CarePlan-0001"/>
+      <code code="18776-5" codeSystem="2.16.840.1.113883.6.1"
+            displayName="Plan of care note"/>
+    </parentDocument>
+  </relatedDocument>
+
+  <component>
+    <structuredBody>
+
+      <!-- ===== THE BARRIER: a health-related social need ===== -->
+      <component>
+        <section>
+          <code code="29762-2" codeSystem="2.16.840.1.113883.6.1"
+                displayName="Social history"/>
+          <title>Health-Related Social Need</title>
+          <text>Food insecurity identified, acting as a barrier to glycemic
+            control. Basis for community referral.</text>
+          <entry>
+            <observation classCode="OBS" moodCode="EVN">
+              <id root="2.16.840.1.113883.19.5.99999.50" extension="SDOH-1"/>
+              <code code="733423003" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Food insecurity"/>
+              <statusCode code="completed"/>
+              <effectiveTime value="20260615"/>
+              <value xsi:type="CD" code="Z59.41"
+                     codeSystem="2.16.840.1.113883.6.90"
+                     codeSystemName="ICD-10-CM"
+                     displayName="Food insecurity"/>
+            </observation>
+          </entry>
+        </section>
+      </component>
+
+      <!-- ===== THE REFERRAL: external service direction ===== -->
+      <component>
+        <section>
+          <code code="18776-5" codeSystem="2.16.840.1.113883.6.1"
+                displayName="Plan of care note"/>
+          <title>Referral</title>
+          <text>Refer to Community Health Partners (CHI) to address food
+            insecurity in support of the A1c goal.</text>
+          <entry>
+            <act classCode="ACT" moodCode="RQO">
+              <id root="2.16.840.1.113883.19.5.99999.20" extension="REF-1"/>
+              <code code="3457005" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Patient referral"/>
+              <text>Referral to Community Health Integration program for food
+                insecurity / health-related social needs support</text>
+              <statusCode code="active"/>
+              <effectiveTime>
+                <low value="20260615"/>
+                <high value="20260715"/>
+              </effectiveTime>
+              <priorityCode code="R" codeSystem="2.16.840.1.113883.5.7"
+                            displayName="routine"/>
+
+              <!-- EXTERNAL performer: representedOrganization is outside -->
+              <performer typeCode="PRF">
+                <assignedEntity>
+                  <id root="2.16.840.1.113883.19.5.77777.3" extension="NAV-1"/>
+                  <assignedPerson>
+                    <name><given>Carmen</given><family>Connector</family></name>
+                  </assignedPerson>
+                  <representedOrganization>
+                    <id root="2.16.840.1.113883.19.5.77777" extension="COMMUNITY-ORG"/>
+                    <name>Community Health Partners (CHI)</name>
+                  </representedOrganization>
+                </assignedEntity>
+              </performer>
+
+              <!-- referred-by: the internal clinician -->
+              <participant typeCode="REFB">
+                <participantRole classCode="ROL">
+                  <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+                  <scopingEntity>
+                    <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+                  </scopingEntity>
+                </participantRole>
+              </participant>
+
+              <!-- referred-to: the external community navigator -->
+              <participant typeCode="REFT">
+                <participantRole classCode="ROL">
+                  <id root="2.16.840.1.113883.19.5.77777.3" extension="NAV-1"/>
+                  <scopingEntity>
+                    <id root="2.16.840.1.113883.19.5.77777" extension="COMMUNITY-ORG"/>
+                  </scopingEntity>
+                </participantRole>
+              </participant>
+
+              <!-- INTENT: this referral serves goal G1 (REFR) -->
+              <entryRelationship typeCode="REFR">
+                <observation classCode="OBS" moodCode="GOL">
+                  <id root="2.16.840.1.113883.19.5.99999.10" extension="G1"/>
+                  <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                        displayName="Hemoglobin A1c"/>
+                </observation>
+              </entryRelationship>
+
+              <!-- WHY: because of the food-insecurity social need (RSON) -->
+              <entryRelationship typeCode="RSON">
+                <observation classCode="OBS" moodCode="EVN">
+                  <id root="2.16.840.1.113883.19.5.99999.50" extension="SDOH-1"/>
+                  <code code="733423003" codeSystem="2.16.840.1.113883.6.96"
+                        codeSystemName="SNOMED CT" displayName="Food insecurity"/>
+                </observation>
+              </entryRelationship>
+            </act>
+          </entry>
+
+          <!-- ===== LOOP CLOSURE: external org reports back ===== -->
+          <entry>
+            <act classCode="ACT" moodCode="EVN">
+              <id root="2.16.840.1.113883.19.5.99999.21" extension="REF-1-DONE"/>
+              <code code="3457005" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Patient referral"/>
+              <text>Community Health Partners enrolled patient in food assistance;
+                referral completed.</text>
+              <statusCode code="completed"/>
+              <effectiveTime value="20260628"/>
+
+              <!-- performed by the EXTERNAL org -->
+              <performer typeCode="PRF">
+                <assignedEntity>
+                  <id root="2.16.840.1.113883.19.5.77777.3" extension="NAV-1"/>
+                  <representedOrganization>
+                    <id root="2.16.840.1.113883.19.5.77777" extension="COMMUNITY-ORG"/>
+                    <name>Community Health Partners (CHI)</name>
+                  </representedOrganization>
+                </assignedEntity>
+              </performer>
+
+              <!-- reference to the external program's report document -->
+              <reference typeCode="REFR">
+                <externalDocument classCode="DOCCLIN" moodCode="EVN">
+                  <id root="2.16.840.1.113883.19.5.77777.9" extension="CHIDOC-1"/>
+                  <code code="57133-1" codeSystem="2.16.840.1.113883.6.1"
+                        displayName="Referral note"/>
+                  <text>Community Health Integration outcome report</text>
+                </externalDocument>
+              </reference>
+
+              <!-- THE LOOP-CLOSING LINK: fulfills referral REF-1 -->
+              <sdtc:inFulfillmentOf1 typeCode="FLFS">
+                <sdtc:actReference classCode="ACT" moodCode="RQO">
+                  <sdtc:id root="2.16.840.1.113883.19.5.99999.20" extension="REF-1"/>
+                </sdtc:actReference>
+              </sdtc:inFulfillmentOf1>
+            </act>
+          </entry>
+
+        </section>
+      </component>
+
+    </structuredBody>
+  </component>
+</ClinicalDocument>
