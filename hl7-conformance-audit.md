@@ -77,8 +77,14 @@ narrative leaned on it.
    entry-level templateIds (e.g. the Care Plan, Progress Note, Referral Note IDs)
    were added illustratively and **not verified** against the C-CDA Implementation
    Guide. They do **not** affect base-CDA schema validity (a `templateId` is just
-   an `II`), but a wrong one is misleading. *Proposed fix:* verify against the
-   C-CDA IG or remove until verified.
+   an `II`), but a wrong one is misleading.
+   *Status: in progress.* **WF1 re-anchored** in `careplan-establish.ccda.xml`
+   using **verified** C-CDA templateIds (Care Plan `…1.15`, Health Concerns
+   `…2.58`, Goals `…2.60`, Interventions `…21.2.3`, Goal Observation `…4.121`,
+   Planned Intervention `…4.146`, Entry Reference `…4.122`), confirmed against
+   HL7's published C-CDA template registry and Goal Observation example. WF2–WF5
+   to follow this template. *Note:* validation is base-CDA XSD; full C-CDA
+   conformance also needs Schematron (a separate step not run here).
 
 3. **Goal-as-measurable-target in WF1 / WF3 / WF4.** Those earlier examples set
    the goal as an A1c value/threshold (`code` = A1c, `value` = 7.0%) — the C-CDA

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  C-CDA CARE PLAN - WF1 ESTABLISH (conformant re-anchor; reference instance)
+  ============================================================================
+  This re-anchors WF1 from base CDA to a CONFORMANT C-CDA Care Plan document,
+  using VERIFIED C-CDA templateIds (see standards-layers.md, hl7-conformance-audit.md).
+  It is the template the other workflows' CDA examples will follow.
+
+  Verified C-CDA identifiers used here:
+    - US Realm Header        2.16.840.1.113883.10.20.22.1.1  (2015-08-01)
+    - Care Plan document     2.16.840.1.113883.10.20.22.1.15 (2015-08-01)  code 18776-5
+    - Health Concerns Sect.  2.16.840.1.113883.10.20.22.2.58 (2015-08-01)  code 75310-3   [SHALL]
+    - Goals Section          2.16.840.1.113883.10.20.22.2.60               code 61146-7   [SHALL]
+    - Interventions Sect. V3 2.16.840.1.113883.10.20.21.2.3  (2015-08-01)  code 62387-6   [SHOULD]
+    - Health Concern Act     2.16.840.1.113883.10.20.22.4.132
+    - Goal Observation       2.16.840.1.113883.10.20.22.4.121   (obs OBS/GOL: code=measure, value=target)
+    - Planned Intervention   2.16.840.1.113883.10.20.22.4.146   (act ACT/INT)
+    - Entry Reference        2.16.840.1.113883.10.20.22.4.122   (links entries by id; code nullFlavor=NP)
+
+  The C-CDA linkage idiom (verified from HL7's Goal Observation example):
+    Goal =[REFR]= Entry Reference =to= Health Concern   (goal addresses concern)
+    Intervention =[REFR]= Entry Reference =to= Goal      (intervention supports goal)
+  Entry Reference avoids duplicating an entry that lives in another section.
+
+  VALIDATION SCOPE: schema-valid against base CDA (CDA_SDTC.xsd). Full C-CDA
+  conformance also requires Schematron rules (not run here) - a separate step.
+  ============================================================================
+-->
+<ClinicalDocument xmlns="urn:hl7-org:v3"
+                  xmlns:sdtc="urn:hl7-org:sdtc"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <realmCode code="US"/>
+  <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
+  <!-- US Realm Header + Care Plan document templates -->
+  <templateId root="2.16.840.1.113883.10.20.22.1.1" extension="2015-08-01"/>
+  <templateId root="2.16.840.1.113883.10.20.22.1.15" extension="2015-08-01"/>
+  <id root="2.16.840.1.113883.19.5.99999.1" extension="CarePlan-0001"/>
+  <code code="18776-5" codeSystem="2.16.840.1.113883.6.1"
+        codeSystemName="LOINC" displayName="Plan of care note"/>
+  <title>Care Plan - Jane Q. Patient</title>
+  <effectiveTime value="20260608100000-0500"/>
+  <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
+  <languageCode code="en-US"/>
+
+  <recordTarget>
+    <patientRole>
+      <id root="2.16.840.1.113883.19.5.99999.2" extension="PT-12345"/>
+      <patient>
+        <name><given>Jane</given><family>Patient</family></name>
+        <administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"/>
+        <birthTime value="19600101"/>
+      </patient>
+    </patientRole>
+  </recordTarget>
+
+  <author>
+    <time value="20260608100000-0500"/>
+    <assignedAuthor>
+      <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+      <assignedPerson><name><given>Alan</given><family>Author</family></name></assignedPerson>
+      <representedOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+        <name>Internal Primary Care Clinic</name>
+      </representedOrganization>
+    </assignedAuthor>
+  </author>
+
+  <custodian>
+    <assignedCustodian>
+      <representedCustodianOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+        <name>Internal Primary Care Clinic</name>
+      </representedCustodianOrganization>
+    </assignedCustodian>
+  </custodian>
+
+  <legalAuthenticator>
+    <time value="20260608101500-0500"/>
+    <signatureCode code="S"/>
+    <assignedEntity>
+      <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+      <representedOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+      </representedOrganization>
+    </assignedEntity>
+  </legalAuthenticator>
+
+  <component>
+    <structuredBody>
+
+      <!-- ============ HEALTH CONCERNS SECTION [SHALL] ============ -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.22.2.58" extension="2015-08-01"/>
+          <code code="75310-3" codeSystem="2.16.840.1.113883.6.1"
+                codeSystemName="LOINC" displayName="Health concerns document"/>
+          <title>Health Concerns</title>
+          <text>Type 2 diabetes mellitus (active).</text>
+          <entry>
+            <!-- Health Concern Act -->
+            <act classCode="ACT" moodCode="EVN">
+              <templateId root="2.16.840.1.113883.10.20.22.4.132"/>
+              <id root="2.16.840.1.113883.19.5.99999.40" extension="HC-1"/>
+              <code code="75310-3" codeSystem="2.16.840.1.113883.6.1"
+                    displayName="Health concern"/>
+              <statusCode code="active"/>
+              <effectiveTime><low value="20260601"/></effectiveTime>
+              <!-- the underlying problem -->
+              <entryRelationship typeCode="SUBJ">
+                <observation classCode="OBS" moodCode="EVN">
+                  <templateId root="2.16.840.1.113883.10.20.22.4.4" extension="2015-08-01"/>
+                  <id root="2.16.840.1.113883.19.5.99999.41" extension="PROB-1"/>
+                  <code code="55607006" codeSystem="2.16.840.1.113883.6.96"
+                        codeSystemName="SNOMED CT" displayName="Problem"/>
+                  <statusCode code="completed"/>
+                  <effectiveTime><low value="20260601"/></effectiveTime>
+                  <value xsi:type="CD" code="44054006"
+                         codeSystem="2.16.840.1.113883.6.96"
+                         codeSystemName="SNOMED CT"
+                         displayName="Type 2 diabetes mellitus"/>
+                </observation>
+              </entryRelationship>
+            </act>
+          </entry>
+        </section>
+      </component>
+
+      <!-- ============ GOALS SECTION [SHALL] ============ -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.22.2.60"/>
+          <code code="61146-7" codeSystem="2.16.840.1.113883.6.1"
+                codeSystemName="LOINC" displayName="Goals"/>
+          <title>Goals</title>
+          <text>Aim: diabetes well-controlled. Target (C-CDA Goal Observation
+            value): A1c at or below 7.0%.</text>
+          <entry>
+            <!-- Goal Observation: code = the MEASURE, value = the TARGET
+                 (the C-CDA pattern; the qualitative aim rides in narrative) -->
+            <observation classCode="OBS" moodCode="GOL">
+              <templateId root="2.16.840.1.113883.10.20.22.4.121"/>
+              <id root="2.16.840.1.113883.19.5.99999.10" extension="G1"/>
+              <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                    codeSystemName="LOINC" displayName="Hemoglobin A1c"/>
+              <statusCode code="active"/>
+              <effectiveTime>
+                <low value="20260608"/><high value="20261208"/>
+              </effectiveTime>
+              <value xsi:type="IVL_PQ"><high value="7.0" unit="%"/></value>
+              <!-- goal ADDRESSES the health concern, via Entry Reference -->
+              <entryRelationship typeCode="REFR">
+                <act classCode="ACT" moodCode="EVN">
+                  <templateId root="2.16.840.1.113883.10.20.22.4.122"/>
+                  <id root="2.16.840.1.113883.19.5.99999.40" extension="HC-1"/>
+                  <code nullFlavor="NP"/>
+                </act>
+              </entryRelationship>
+            </observation>
+          </entry>
+        </section>
+      </component>
+
+      <!-- ============ INTERVENTIONS SECTION [SHOULD] ============ -->
+      <component>
+        <section>
+          <templateId root="2.16.840.1.113883.10.20.21.2.3" extension="2015-08-01"/>
+          <code code="62387-6" codeSystem="2.16.840.1.113883.6.1"
+                codeSystemName="LOINC" displayName="Interventions Provided"/>
+          <title>Interventions</title>
+          <text>Internal: diabetes education (RN). External: retinal eye exam
+            (ophthalmology). Both support the A1c goal.</text>
+
+          <!-- INTERNAL planned intervention -->
+          <entry>
+            <act classCode="ACT" moodCode="INT">
+              <templateId root="2.16.840.1.113883.10.20.22.4.146"/>
+              <id root="2.16.840.1.113883.19.5.99999.20" extension="T1"/>
+              <code code="409063005" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Counselling"/>
+              <statusCode code="active"/>
+              <effectiveTime><low value="20260610"/><high value="20260624"/></effectiveTime>
+              <performer typeCode="PRF">
+                <assignedEntity>
+                  <id root="2.16.840.1.113883.19.5.99999.3" extension="RN-7"/>
+                  <representedOrganization>
+                    <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+                    <name>Internal Primary Care Clinic</name>
+                  </representedOrganization>
+                </assignedEntity>
+              </performer>
+              <!-- intervention SUPPORTS the goal, via Entry Reference -->
+              <entryRelationship typeCode="REFR">
+                <act classCode="ACT" moodCode="EVN">
+                  <templateId root="2.16.840.1.113883.10.20.22.4.122"/>
+                  <id root="2.16.840.1.113883.19.5.99999.10" extension="G1"/>
+                  <code nullFlavor="NP"/>
+                </act>
+              </entryRelationship>
+            </act>
+          </entry>
+
+          <!-- EXTERNAL planned intervention (only difference: external org) -->
+          <entry>
+            <act classCode="ACT" moodCode="INT">
+              <templateId root="2.16.840.1.113883.10.20.22.4.146"/>
+              <id root="2.16.840.1.113883.19.5.99999.20" extension="T2"/>
+              <code code="410451008" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Eye examination"/>
+              <statusCode code="active"/>
+              <effectiveTime><low value="20260610"/><high value="20260710"/></effectiveTime>
+              <performer typeCode="PRF">
+                <assignedEntity>
+                  <id root="2.16.840.1.113883.19.5.88888.3" extension="MD-EYE-2"/>
+                  <representedOrganization>
+                    <id root="2.16.840.1.113883.19.5.88888" extension="OTHER-ORG"/>
+                    <name>External Eye Specialists Group</name>
+                  </representedOrganization>
+                </assignedEntity>
+              </performer>
+              <entryRelationship typeCode="REFR">
+                <act classCode="ACT" moodCode="EVN">
+                  <templateId root="2.16.840.1.113883.10.20.22.4.122"/>
+                  <id root="2.16.840.1.113883.19.5.99999.10" extension="G1"/>
+                  <code nullFlavor="NP"/>
+                </act>
+              </entryRelationship>
+            </act>
+          </entry>
+        </section>
+      </component>
+
+    </structuredBody>
+  </component>
+</ClinicalDocument>

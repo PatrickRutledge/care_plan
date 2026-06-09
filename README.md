@@ -34,7 +34,8 @@ every workflow realizes.
 | [`wf4-assess-identify.md`](wf4-assess-identify.md) | WF4 process map: assess → identify problem → set goal. The start of the arc and the justification root. |
 | [`wf5-referral-handoff.md`](wf5-referral-handoff.md) | WF5 process map: external referral with closed-loop reporting (CHI/community hand-off). |
 | [`state-machine.md`](state-machine.md) | Mermaid diagrams of the `moodCode` / `statusCode` state machine (renders on GitHub). |
-| [`careplan-example.xml`](careplan-example.xml) | A concrete, **schema-valid** CDA Care Plan instance: 1 goal, 1 internal task, 1 external task, 1 completion event. |
+| [`careplan-establish.ccda.xml`](careplan-establish.ccda.xml) | **Conformant C-CDA** Care Plan (WF1) — real C-CDA templateIds, the Health Concerns / Goals / Interventions sections, Goal Observation + Planned Intervention + Entry Reference. The template the other workflows re-anchor to. |
+| [`careplan-example.xml`](careplan-example.xml) | The original **base-CDA** WF1 instance (kept to show grammar-vs-conformant difference). Superseded by the `.ccda.xml` version above. |
 | [`careplan-example.rendered.html`](careplan-example.rendered.html) | The CDA instance run through the HL7 CDA stylesheet — the human-readable, attestable view. Open in a browser. |
 | [`careplan-example.fhir.json`](careplan-example.fhir.json) | FHIR R4 mirror of the same plan (Patient, CareTeam, Goal, CarePlan, 2 Tasks) — the live-workflow representation. |
 | [`cda-to-fhir-mapping.md`](cda-to-fhir-mapping.md) | The Rosetta-stone table: same data atoms, CDA column vs. FHIR column. |
