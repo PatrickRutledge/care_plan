@@ -24,6 +24,7 @@ every workflow realizes.
 |---|---|
 | [`clinical-process.md`](clinical-process.md) | **The spine.** The clinical care-planning cycle, the temporal dependency graph, and the goal→service→evaluation intent. **Start here.** |
 | [`discovery-summary.md`](discovery-summary.md) | **End-of-phase-1 synthesis.** What the discovery established, what robustness was proven, and the open questions for the next phase. |
+| [`hl7-conformance-audit.md`](hl7-conformance-audit.md) | **Honest audit** of every pattern against authoritative HL7 definitions: what's verified-correct, what was overstated (`REFR`), and what's still questionable (patient-as-performer, templateIds, goal/objective consistency). |
 | [`goal-objective-task-model.md`](goal-objective-task-model.md) | **Comparison-phase refinement.** Maps the clinician's goal/objective/task language onto the *actual* HL7 fields — the "objective" is `Goal.target`, not a separate record. Plus the accountability separation (team / patient / nature), which HL7's own fields already encode. |
 | [`careplan-goal-model-example.xml`](careplan-goal-model-example.xml) | Schema-valid CDA: single Goal Observation (no invented nesting) + consent gate + AWV encounter + a patient-owned task. |
 | [`careplan-goal-model-example.fhir.json`](careplan-goal-model-example.fhir.json) | FHIR mirror where `Goal.description` (aim) + `Goal.target` (objective) carry the distinction natively; `Task.status` vs `Goal.achievementStatus` carry the accountability split. |

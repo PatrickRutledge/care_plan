@@ -86,18 +86,26 @@ The directionality is a loop encoded entirely in data:
 
 How the data carries the intent:
 
-| Intentional relationship | The data that encodes it |
-|---|---|
-| This service exists **to serve this goal** | `entryRelationship typeCode="REFR"` (act → `GOL`) |
-| This service is **because of this problem** | `entryRelationship typeCode="RSON"` (act → condition) |
-| This evaluation **measures this goal** | `observation EVN` value compared to `GOL` target |
-| This revision **replaces** the prior intent | `relatedDocument`/`entryRelationship typeCode="RPLC"` |
+| Intentional relationship | The data that encodes it | Strength |
+|---|---|---|
+| This service **contributes toward this goal** | FHIR `CarePlan.activity.detail.goal`; CDA `entryRelationship typeCode="REFR"` | **explicit in FHIR**; in CDA it rides on the generic `REFR` ("refers to") |
+| This service is **because of this problem** | `entryRelationship typeCode="RSON"` (act → condition) | explicit ("has reason") |
+| This evaluation **measures this goal** | FHIR `Goal.outcomeReference`; CDA `observation EVN` value vs `GOL` target | explicit in FHIR |
+| This revision **replaces** the prior intent | FHIR `CarePlan.replaces`; CDA `relatedDocument typeCode="RPLC"` | explicit |
 
-**Auditable consequence:** a service with *no* `REFR` link to a goal is, by this
-model, an **unjustified service** — it appears in the plan with no intent behind
-it. The data model makes "are our services actually directed at our goals?" a
-*queryable* question rather than a chart-review opinion. That is the operational
-power of anchoring intent in the standard.
+> **Honest note (see [`hl7-conformance-audit.md`](hl7-conformance-audit.md)):**
+> the service→goal link is a *first-class field in FHIR* (`activity.detail.goal`
+> = "goals this activity contributes toward"). In **CDA** it rides on the generic
+> `REFR` relationship, which HL7 defines only as **"refers to"** — so in CDA the
+> "serves the goal" meaning is a *convention*, not a built-in semantic. The
+> intentional-direction principle is real and FHIR encodes it directly; do not
+> over-read CDA's `REFR`.
+
+**Auditable consequence (in FHIR):** a service with *no* `activity.detail.goal`
+link is, by this model, an **unjustified service** — it appears in the plan with
+no goal behind it. This makes "are our services actually directed at our goals?"
+a *queryable* question rather than a chart-review opinion — directly in FHIR, and
+by convention in CDA.
 
 ---
 
