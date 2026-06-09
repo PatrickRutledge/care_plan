@@ -23,11 +23,11 @@ Reference instances:
 |---|---|---|---|---|---|
 | 1 | Conduct follow-up visit | Provider/RN | `encounter moodCode=EVN` | — → `EVN / completed` | `effectiveTime`, `code` |
 | 2 | Record outcome measure | RN / lab feed | `observation moodCode=EVN` | — → `EVN / completed` | `value` (7.8%), `interpretationCode=H` |
-| 3 | Tie outcome to its goal | System | `entryRelationship typeCode=REFR` (outcome → `GOL`) | (link) | outcome A1C-1 → goal G1 |
+| 3 | Tie outcome to its goal | System | `entryRelationship typeCode=GEVL` (outcome *evaluates* `GOL`) | (link) | outcome A1C-1 → goal G1 |
 | 4 | Evaluate goal achievement | Provider | `observation moodCode=GOL` `statusCode` / FHIR `Goal.achievementStatus` | `GOL / active` stays `active` | not-achieved (7.8 > 7.0) |
 | 5 | Decide: revise vs. close | Provider | (gateway) | branch | met → close (WF2); not met → revise |
 | 6 | Direct a new service | Provider | **new** `act moodCode=RQO` | — → `RQO / active` | `id=T3`, `code`, due window |
-| 7 | Justify it — serves goal | System | `entryRelationship typeCode=REFR` (T3 → `GOL`) | (link) | T3 → G1 |
+| 7 | Justify it — points at goal | System | `entryRelationship typeCode=REFR` (T3 → `GOL`; "refers to" — a convention, not a built-in "serves") | (link) | T3 → G1 |
 | 8 | Justify it — reason | System | `entryRelationship typeCode=RSON` (T3 → outcome) | (link) | T3 → A1C-1 |
 
 ## The decision gateway (step 5)
@@ -52,7 +52,7 @@ literally built from the outcome (A1C-1) and the goal (G1) of this round.
 | Concept | CDA | FHIR |
 |---|---|---|
 | Outcome measured | `observation moodCode=EVN` + `value` | `Observation` `status=final` + `valueQuantity` |
-| Outcome measures the goal | `entryRelationship typeCode=REFR` | `Goal.outcomeReference → Observation` |
+| Outcome measures the goal | `entryRelationship typeCode=GEVL` (evaluates goal) | `Goal.outcomeReference → Observation` |
 | Goal not yet achieved | `GOL` `statusCode=active` | `Goal.achievementStatus = not-achieved` |
 | New service serves the goal | `entryRelationship typeCode=REFR` (act → GOL) | weaker — rides through `CarePlan.goal` + `CarePlan.activity` |
 | New service's reason | `entryRelationship typeCode=RSON` (act → outcome) | `Task.reasonReference → Observation` |

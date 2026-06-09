@@ -26,7 +26,7 @@ Reference instances:
 | 2 | Create referral | Provider | `act moodCode=RQO` (referral) | — → `RQO / active` | `id=REF-1`, referral `code`, due window |
 | 3 | Route to external org | System | `performer` → external `representedOrganization` | (assign) | org = COMMUNITY-ORG (outside) |
 | 4 | Record referred-by / -to | System | `participant typeCode=REFB` / `REFT` | (link) | internal DR-1 / external NAV-1 |
-| 5 | Justify — serves goal | System | `entryRelationship typeCode=REFR` | (link) | REF-1 → G1 |
+| 5 | Justify — points at goal | System | `entryRelationship typeCode=REFR` ("refers to"; a convention, not a built-in "serves") | (link) | REF-1 → G1 |
 | 6 | Justify — reason | System | `entryRelationship typeCode=RSON` | (link) | REF-1 → SDOH-1 |
 | 7 | External org performs & reports | External team | **new** `act moodCode=EVN` | — → `EVN / completed` | performer = external org, `effectiveTime` |
 | 8 | Attach external report | External team | `reference` → `externalDocument` | (link) | CHIDOC-1 |
@@ -37,7 +37,7 @@ Reference instances:
 ```mermaid
 flowchart LR
     N["Social need<br/>observation EVN<br/>food insecurity"] -->|"RSON"| R["Referral<br/>act RQO id=REF-1<br/>performer = EXTERNAL org"]
-    G["Goal G1<br/>A1c &lt; 7.0%"] -.->|"REFR (serves)"| R
+    G["Goal G1<br/>A1c &lt; 7.0%"] -.->|"REFR (refers to)"| R
     R ==>|"external org performs"| D["Completion<br/>act EVN id=REF-1-DONE<br/>performer = EXTERNAL org"]
     D -->|"inFulfillmentOf (FLFS)"| R
     D -->|"reference → externalDocument"| X["External report<br/>CHIDOC-1"]
