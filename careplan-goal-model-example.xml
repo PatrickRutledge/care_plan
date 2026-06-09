@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  SAMPLE CDA R2.0 GOAL / OBJECTIVE / TASK MODEL  (reference instance)
+  ============================================================================
+  Demonstrates the three-layer model from goal-objective-task-model.md, the way
+  a good clinician actually structures a chronic-care plan:
+
+    GOAL (aim, qualitative):     "Diabetes well-controlled"   (GOL, value=CD)
+       =[COMP]= OBJECTIVE (measure/range):  A1c held 6.5-7.5% (GOL, value=IVL_PQ)
+
+    TASKS (completable actions, each serving the goal via REFR):
+       T-RX   prescribe medication regimen     performer = PROVIDER  (team)
+       T-SCH  schedule 4 follow-up appointments performer = CARE MGR  (team)
+       T-TRANSPORT  arrange transportation      performer = CARE MGR  (team, SDOH)
+       T-ATTEND  attend the appointments        performer = PATIENT   (patient-expected)
+
+  ACCOUNTABILITY SEPARATION (the point):
+    - Team tasks (T-RX, T-SCH, T-TRANSPORT) are things the team can COMPLETE.
+    - T-ATTEND is owned by the PATIENT - an expectation, not a team deliverable.
+    - The OBJECTIVE (A1c range) is measured by nature, tracked separately from
+      whether any task was completed.
+
+  NOTE: clinical codes illustrative; the STRUCTURE is the point.
+  ============================================================================
+-->
+<ClinicalDocument xmlns="urn:hl7-org:v3"
+                  xmlns:sdtc="urn:hl7-org:sdtc"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <realmCode code="US"/>
+  <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
+  <templateId root="2.16.840.1.113883.10.20.22.1.15" extension="2015-08-01"/>
+  <id root="2.16.840.1.113883.19.5.99999.1" extension="CarePlan-GM-0001"/>
+  <code code="18776-5" codeSystem="2.16.840.1.113883.6.1"
+        codeSystemName="LOINC" displayName="Plan of care note"/>
+  <title>Care Plan (Goal/Objective/Task model) - Jane Q. Patient</title>
+  <effectiveTime value="20260608100000-0500"/>
+  <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
+  <languageCode code="en-US"/>
+
+  <recordTarget>
+    <patientRole>
+      <id root="2.16.840.1.113883.19.5.99999.2" extension="PT-12345"/>
+      <patient>
+        <name><given>Jane</given><family>Patient</family></name>
+        <administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"/>
+        <birthTime value="19600101"/>
+      </patient>
+    </patientRole>
+  </recordTarget>
+
+  <author>
+    <time value="20260608100000-0500"/>
+    <assignedAuthor>
+      <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+      <assignedPerson><name><given>Alan</given><family>Author</family></name></assignedPerson>
+      <representedOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+        <name>Internal Primary Care Clinic</name>
+      </representedOrganization>
+    </assignedAuthor>
+  </author>
+
+  <custodian>
+    <assignedCustodian>
+      <representedCustodianOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+        <name>Internal Primary Care Clinic</name>
+      </representedCustodianOrganization>
+    </assignedCustodian>
+  </custodian>
+
+  <legalAuthenticator>
+    <time value="20260608101500-0500"/>
+    <signatureCode code="S"/>
+    <assignedEntity>
+      <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+      <representedOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+      </representedOrganization>
+    </assignedEntity>
+  </legalAuthenticator>
+
+  <!-- CONSENT GATE: care management consent (CCM precondition).
+       In the header sequence, authorization comes after legalAuthenticator. -->
+  <authorization>
+    <consent>
+      <id root="2.16.840.1.113883.19.5.99999.70" extension="CONSENT-CCM-1"/>
+      <code code="59284-0" codeSystem="2.16.840.1.113883.6.1"
+            displayName="Patient consent"/>
+      <statusCode code="completed"/>
+    </consent>
+  </authorization>
+
+  <!-- The encounter the plan was created in (AWV) -->
+  <componentOf>
+    <encompassingEncounter>
+      <id root="2.16.840.1.113883.19.5.99999.80" extension="AWV-1"/>
+      <code code="AMB" codeSystem="2.16.840.1.113883.5.4"
+            displayName="ambulatory"/>
+      <effectiveTime value="20260608"/>
+    </encompassingEncounter>
+  </componentOf>
+
+  <component>
+    <structuredBody>
+
+      <!-- ===== GOAL + OBJECTIVE ===== -->
+      <component>
+        <section>
+          <code code="61146-7" codeSystem="2.16.840.1.113883.6.1" displayName="Goals"/>
+          <title>Goal and Objective</title>
+          <text>Goal: diabetes well-controlled. Objective: maintain A1c 6.5-7.5%.</text>
+          <entry>
+            <!-- GOAL: the clinical AIM, qualitative (value = a state) -->
+            <observation classCode="OBS" moodCode="GOL">
+              <id root="2.16.840.1.113883.19.5.99999.10" extension="GOAL-1"/>
+              <code code="408907000" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Diabetes mellitus control"/>
+              <statusCode code="active"/>
+              <value xsi:type="CD" code="412776001"
+                     codeSystem="2.16.840.1.113883.6.96"
+                     displayName="Well controlled"/>
+
+              <!-- OBJECTIVE: the measurable range, COMPONENT of the goal -->
+              <entryRelationship typeCode="COMP">
+                <observation classCode="OBS" moodCode="GOL">
+                  <id root="2.16.840.1.113883.19.5.99999.11" extension="OBJ-1"/>
+                  <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                        displayName="Hemoglobin A1c"/>
+                  <statusCode code="active"/>
+                  <!-- a RANGE, not a single threshold: this is maintenance -->
+                  <value xsi:type="IVL_PQ">
+                    <low value="6.5" unit="%"/>
+                    <high value="7.5" unit="%"/>
+                  </value>
+                </observation>
+              </entryRelationship>
+            </observation>
+          </entry>
+        </section>
+      </component>
+
+      <!-- ===== TASKS (completable actions, each REFR the goal) ===== -->
+      <component>
+        <section>
+          <code code="18776-5" codeSystem="2.16.840.1.113883.6.1"
+                displayName="Plan of care note"/>
+          <title>Tasks</title>
+          <text>Prescribe regimen (provider); schedule appointments (care manager);
+            arrange transportation (care manager, SDOH); attend appointments (patient).</text>
+
+          <!-- TEAM TASK: provider prescribes regimen -->
+          <entry>
+            <act classCode="ACT" moodCode="RQO">
+              <id root="2.16.840.1.113883.19.5.99999.20" extension="T-RX"/>
+              <code code="33633005" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Prescription of drug"/>
+              <text>Prescribe/adjust medication regimen for glycemic control</text>
+              <statusCode code="active"/>
+              <effectiveTime><low value="20260608"/><high value="20260615"/></effectiveTime>
+              <performer typeCode="PRF">
+                <assignedEntity>
+                  <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+                  <representedOrganization>
+                    <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+                  </representedOrganization>
+                </assignedEntity>
+              </performer>
+              <entryRelationship typeCode="REFR">
+                <observation classCode="OBS" moodCode="GOL">
+                  <id root="2.16.840.1.113883.19.5.99999.10" extension="GOAL-1"/>
+                  <code code="408907000" codeSystem="2.16.840.1.113883.6.96"
+                        displayName="Diabetes mellitus control"/>
+                </observation>
+              </entryRelationship>
+            </act>
+          </entry>
+
+          <!-- TEAM TASK: care manager schedules 4 appointments -->
+          <entry>
+            <act classCode="ACT" moodCode="RQO">
+              <id root="2.16.840.1.113883.19.5.99999.20" extension="T-SCH"/>
+              <code code="394581000" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Appointment scheduling"/>
+              <text>Schedule four follow-up appointments</text>
+              <statusCode code="active"/>
+              <effectiveTime><low value="20260608"/><high value="20260610"/></effectiveTime>
+              <performer typeCode="PRF">
+                <assignedEntity>
+                  <id root="2.16.840.1.113883.19.5.99999.3" extension="CM-1"/>
+                  <assignedPerson><name><given>Cara</given><family>Manager</family></name></assignedPerson>
+                  <representedOrganization>
+                    <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+                  </representedOrganization>
+                </assignedEntity>
+              </performer>
+              <entryRelationship typeCode="REFR">
+                <observation classCode="OBS" moodCode="GOL">
+                  <id root="2.16.840.1.113883.19.5.99999.10" extension="GOAL-1"/>
+                  <code code="408907000" codeSystem="2.16.840.1.113883.6.96"
+                        displayName="Diabetes mellitus control"/>
+                </observation>
+              </entryRelationship>
+            </act>
+          </entry>
+
+          <!-- TEAM TASK (SDOH): care manager removes a barrier -->
+          <entry>
+            <act classCode="ACT" moodCode="RQO">
+              <id root="2.16.840.1.113883.19.5.99999.20" extension="T-TRANSPORT"/>
+              <code code="183849009" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Arranging transport"/>
+              <text>Arrange transportation to remove barrier to attendance</text>
+              <statusCode code="active"/>
+              <effectiveTime><low value="20260608"/><high value="20260612"/></effectiveTime>
+              <performer typeCode="PRF">
+                <assignedEntity>
+                  <id root="2.16.840.1.113883.19.5.99999.3" extension="CM-1"/>
+                  <representedOrganization>
+                    <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+                  </representedOrganization>
+                </assignedEntity>
+              </performer>
+              <entryRelationship typeCode="REFR">
+                <observation classCode="OBS" moodCode="GOL">
+                  <id root="2.16.840.1.113883.19.5.99999.10" extension="GOAL-1"/>
+                  <code code="408907000" codeSystem="2.16.840.1.113883.6.96"
+                        displayName="Diabetes mellitus control"/>
+                </observation>
+              </entryRelationship>
+            </act>
+          </entry>
+
+          <!-- PATIENT-EXPECTED TASK: performer is the PATIENT, not the team -->
+          <entry>
+            <act classCode="ACT" moodCode="RQO">
+              <id root="2.16.840.1.113883.19.5.99999.20" extension="T-ATTEND"/>
+              <code code="308273005" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Follow-up appointment attendance"/>
+              <text>Patient to attend the four scheduled appointments</text>
+              <statusCode code="active"/>
+              <effectiveTime><low value="20260615"/><high value="20261208"/></effectiveTime>
+              <!-- performer = the PATIENT: an expectation, not a team deliverable -->
+              <performer typeCode="PRF">
+                <assignedEntity>
+                  <id root="2.16.840.1.113883.19.5.99999.2" extension="PT-12345"/>
+                  <code code="116154003" codeSystem="2.16.840.1.113883.6.96"
+                        displayName="Patient"/>
+                </assignedEntity>
+              </performer>
+              <entryRelationship typeCode="REFR">
+                <observation classCode="OBS" moodCode="GOL">
+                  <id root="2.16.840.1.113883.19.5.99999.10" extension="GOAL-1"/>
+                  <code code="408907000" codeSystem="2.16.840.1.113883.6.96"
+                        displayName="Diabetes mellitus control"/>
+                </observation>
+              </entryRelationship>
+            </act>
+          </entry>
+
+        </section>
+      </component>
+
+    </structuredBody>
+  </component>
+</ClinicalDocument>
