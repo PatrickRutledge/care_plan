@@ -47,6 +47,14 @@ that points back to the order by `id`. It does not mutate the original order
 in place. Any system, in any order, on any screen can produce this event and it
 will still reconcile. That is the property that makes the path non-load-bearing.
 
+**Note on `REFR` (the "Link tasks to goal" / "Roll progress up to goal" rows):**
+in CDA, `entryRelationship typeCode="REFR"` means only **"refers to"** — a generic
+reference, *not* a built-in "serves the goal" semantic. The goal-direction intent
+is a convention layered on it (explicit in FHIR via plan-level `CarePlan.goal`;
+FHIR has no per-task goal field for Task-based plans). Where an act *evaluates* a
+goal (an outcome), the conformant `.ccda` files use the purpose-built `GEVL`
+("evaluates goal") code instead. See [`hl7-conformance-audit.md`](hl7-conformance-audit.md).
+
 ---
 
 ## Other recognized workflows (same atoms, different configuration)
