@@ -1,98 +1,108 @@
-# Goal / Objective / Task — the three-layer model
+# Goal, Target, and Activity — using ONLY HL7-defined care-plan fields
 
-A refinement that came out of comparing the data-anchored model to real chronic-
-care-management (CCM) practice. It corrects a flattening that most systems (and
-our own early workflows) fall into: treating "A1c < 7.0%" as a *goal*. It is not.
+> **Correction.** An earlier draft of this file invented a nested "objective"
+> entity (a child observation under the goal). **HL7 defines no such entity.**
+> This version uses only fields HL7 actually specifies. The whole point of this
+> repo is to bring clarity to practitioners by grounding them in the standard —
+> so we may not add structure the standard does not have. If HL7 has no field for
+> it, it does not go in the care plan.
 
-> A good clinician does **not** set a goal of "A1c < 7.0%." They set a goal of
-> **"diabetes well-controlled"** or **"maintain and improve ADLs"** — and then
-> use a measurable **objective** (an A1c range, an ADL score) to indicate
-> progress, and assign **tasks** (prescribe a regimen, refer to PT, schedule
-> visits, call the patient) that the team can actually *complete*.
+## What HL7 actually defines for a care plan (authoritative)
 
-## The three layers
+Source: FHIR R4 [CarePlan](https://hl7.org/fhir/R4/careplan.html) and
+[Goal](https://hl7.org/fhir/R4/goal.html) resource definitions.
 
-| Layer | Definition | Examples | Nature |
-|---|---|---|---|
-| **Goal** | the clinical *aim / state* being sought | "well-controlled diabetes"; "maintain & improve ADL"; "limit exacerbations"; "decrease risk of death" | qualitative; the destination |
-| **Objective** | the *measurable* range/value that indicates the goal | A1c held in 6.5–7.5%; ADL score ≥ baseline; 0 exacerbations / 6 mo | quantitative; **measured, not completed** |
-| **Task** | a concrete *completable action* assigned to a team member | prescribe medication regimen; refer to PT; schedule 4 appointments; call patient; arrange transportation | binary; **done / not done** |
+**A care plan has exactly these first-class parts:**
 
-A goal is a *direction*. An objective is the *yardstick*. A task is *work someone
-can finish*.
+| HL7 field | What it is |
+|---|---|
+| `CarePlan.addresses` → Condition | the problems/concerns the plan manages |
+| `CarePlan.goal` → Goal | the goals of the plan |
+| `CarePlan.activity` → Task / ServiceRequest / MedicationRequest / Appointment | the actions (tasks/interventions) |
+| `CarePlan.careTeam` → CareTeam | who is involved |
 
-## The accountability principle (why this separation is the whole point)
+**A Goal has exactly these parts** (the relevant ones):
 
-Three tiers of control, which the data must keep distinct:
-
-```
-  TEAM controls          PATIENT controls         NATURE controls
-  ─────────────          ────────────────         ───────────────
-  Task completion   →    Adherence/engagement →   Objective achievement
-  (prescribe, refer,     (attend, take meds,      (does the A1c actually
-   schedule, call)        follow through)          move; does decline stop)
-  binary: done/not       influenceable, not        not anyone's "fault"
-                          guaranteed
-```
-
-- A **task** must be completable by the assignee. "Schedule four appointments" is
-  a task (the care manager can complete it). "Patient attends four appointments"
-  is **not** a team task — it is a patient expectation. Model it as a task whose
-  `performer`/owner is the **patient**, never as something the team "completes."
-- The care manager's work on **SDOH barriers** (transportation, financial) *is*
-  completable team work — removing obstacles on the pathway to care — even though
-  it cannot guarantee the patient walks the path.
-- **Task completion ≠ objective achievement.** All tasks can be done, the patient
-  fully adherent, and the objective still unmet — because biology, not effort,
-  decides. Never credit the team for outcomes they didn't control, and never
-  blame the team for nature.
-
-## How WF3 (evaluate) must change
-
-The follow-up loop must evaluate **two independent things**, not one:
-
-| Question | Measured by | If "no", the remedy is… |
+| HL7 field | Cardinality | What it is |
 |---|---|---|
-| Did the team do its job? | **task completion** rate | fix execution / remove barriers (accountability) |
-| Did the objective move? | **objective** value vs. range | revise the plan/approach — or accept it's biology |
+| `Goal.description` | 1..1 CodeableConcept | the desired **objective** — i.e. the *aim* ("well-controlled") |
+| `Goal.target.measure` | 0..1 CodeableConcept | the parameter being tracked (e.g. Hemoglobin A1c) |
+| `Goal.target.detailQuantity` / `detailRange` / `detailCodeableConcept` | 0..1 | the **target value** (a number, a range, or a coded state) |
+| `Goal.target.dueDate` / `dueDuration` | 0..1 | the deadline |
+| `Goal.lifecycleStatus` | 1..1 | proposed / active / completed … (the goal's own state) |
+| `Goal.achievementStatus` | 0..1 | in-progress / improving / **sustaining** / achieved / not-achieved … |
+| `Goal.category` | 0..* | treatment / dietary / behavioral … |
+| `Goal.addresses` → Condition | 0..* | the problem the goal addresses |
+| `Goal.outcomeReference` → Observation | 0..* | what actually changed (the measured result) |
 
-The re-direct-vs-close decision (WF3 gateway) keys off the **objective**; the
-team's performance review keys off **task completion**. Conflating them
-mis-assigns blame and hides the real problem.
+## The three words practitioners use → HL7's actual fields
 
-## Goal types in chronic care (mostly NOT "achievement")
+This crosswalk *is* the clarity. The clinician's mental model is right; it just
+maps onto fewer HL7 records than people expect.
 
-Because chronic-care goals are usually about holding ground, the objective's
-*success condition* differs by goal type:
-
-| Goal type | Success condition | Objective shape | FHIR achievementStatus |
+| Practitioner says | It is NOT a separate record — it is this HL7 field | FHIR | CDA |
 |---|---|---|---|
-| **Achievement** | cross a threshold | value < / > target | `achieved` / `not-achieved` |
-| **Maintenance** | stay in range | value within band | `sustaining` / `worsening` |
-| **Prevention** | event does *not* occur | count of events over time = 0 | `sustaining` / `worsening` |
-| **Risk reduction** | risk score trends down | score vs. prior | `improving` / `worsening` |
+| **Goal** (the aim: "well-controlled", "maintain ADL") | the goal's description | `Goal.description` | Goal Observation `code` / narrative |
+| **Objective** (the measurable range/value) | **the goal's target — a field *inside* the goal** | `Goal.target.measure` + `target.detail[x]` | Goal Observation `value` |
+| **Task** (the completable action) | an activity of the plan | `CarePlan.activity` → `Task`/`ServiceRequest` | `act moodCode="RQO"` |
 
-Our early examples used only **achievement**. Chronic care is mostly the other
-three. The data model already supports them (a `target` can be a *range*, and
-`Goal.achievementStatus` has `sustaining`), but the workflows must use them.
+**The headline for confused practitioners:** *the objective is not a thing you
+create — it is the target field of the goal.* One Goal record carries both the
+aim (`description`) and the measure (`target`). You do not make a goal, then make
+an objective under it. You make **one goal that has a target.**
 
-## Mapping to the standards
+## A real difference between the two HL7 representations (clarity point)
 
-| Layer | CDA R2.0 | FHIR R4 |
+Reading the definitions exposed an asymmetry worth knowing:
+
+- **FHIR Goal separates the aim from the measure cleanly.** `description` holds
+  the qualitative aim ("diabetes well-controlled") and `target.measure` +
+  `target.detail` holds the metric ("A1c 6.5–7.5%"). So FHIR lets a clinician
+  record the goal as a *state* and the objective as a *target* — exactly the
+  distinction good clinicians make — **in one Goal, with no invention.**
+- **CDA's Goal Observation is a single observation** (`code` + `value`). It tends
+  to encode the measurable target directly (`code` = the measure, `value` = the
+  target), so the qualitative aim has to ride in the `code` concept or the
+  narrative. CDA collapses what FHIR separates.
+
+Neither adds an "objective" record. The practitioner's "objective" is `Goal.target`
+(FHIR) or the Goal Observation's `value` (CDA), in both cases **a field of the
+goal.**
+
+## The accountability separation — already built into HL7's fields
+
+The earlier finding (team controls task completion; nature controls the outcome)
+is not something we impose — **HL7 already separates these into different fields:**
+
+| Question | Who controls it | HL7 field |
 |---|---|---|
-| Goal (aim) | `observation moodCode="GOL"`, `value xsi:type="CD"` (a *state*, e.g. "controlled") | `Goal.description` + `Goal.category` |
-| Objective (measure/range) | a `GOL` observation linked `entryRelationship typeCode="COMP"`, `value xsi:type="IVL_PQ"` (a range) | `Goal.target.measure` + `detailRange` |
-| Task (action) | `act moodCode="RQO"` → `EVN` | `Task` (status = completion) |
-| Patient-expected task | `act moodCode="RQO"`, `performer`/owner = **patient** | `Task.owner = Patient` |
-| SDOH barrier removal | `act moodCode="RQO"` addressing an SDOH `observation` | `Task` with `reasonReference → Condition` (SDOH) |
-| Task completed (team control) | `statusCode="completed"` + `inFulfillmentOf` | `Task.status="completed"` |
-| Objective met (nature) | objective `observation value` vs range | `Goal.achievementStatus` |
+| Was the action done? | the team | `CarePlan.activity.detail.status` / `Task.status` |
+| Did the measure move? | nature | `Goal.achievementStatus` + `Goal.outcomeReference` |
 
-**Key links in data:**
-- Goal `=[COMP]=` Objective (the goal *comprises* a measurable objective)
-- Task `=[REFR]=` Goal (the task *serves* the goal)
-- Task `=[RSON]=` SDOH/problem (the task's *reason*)
-- Objective `measured by` outcome observation (nature's verdict)
+Activity status and goal achievement are *distinct fields by design*. So the
+standard itself says: track "did we do the work" separately from "did the goal
+get met." A clinician who conflates them is fighting the data model; one who
+keeps them apart is using it as intended.
 
-See [`careplan-goal-model-example.xml`](careplan-goal-model-example.xml) for a
-schema-valid instance of all three layers with the accountability separation.
+## Goal types map to existing fields too (no new structure)
+
+| Goal type | Success condition | HL7 fields used |
+|---|---|---|
+| Achievement | cross a threshold | `target.detailQuantity` + `achievementStatus = achieved` |
+| Maintenance | stay in range | `target.detailRange` + `achievementStatus = sustaining` |
+| Prevention | event does not occur | `target.detailRange`/measure of events + `achievementStatus = sustaining` |
+| Risk reduction | score trends down | `target.measure` (risk score) + `achievementStatus = improving` |
+
+Most chronic-care goals are maintenance/prevention — and HL7's `achievementStatus`
+has a literal **`sustaining`** code for "maintenance goal still being met." The
+fields already exist; the discipline is using the right one.
+
+## What we will not do
+
+Add fields HL7 has not defined. No "objective" record, no nested target
+observation, no invented relationships. The care plan contains exactly what HL7
+specifies — that constraint is the source of the clarity, not a limit on it.
+
+See [`careplan-goal-model-example.xml`](careplan-goal-model-example.xml) (CDA)
+and [`careplan-goal-model-example.fhir.json`](careplan-goal-model-example.fhir.json)
+(FHIR) for instances that use only these fields.

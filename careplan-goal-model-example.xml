@@ -111,32 +111,26 @@
         <section>
           <code code="61146-7" codeSystem="2.16.840.1.113883.6.1" displayName="Goals"/>
           <title>Goal and Objective</title>
-          <text>Goal: diabetes well-controlled. Objective: maintain A1c 6.5-7.5%.</text>
+          <text>Goal: diabetes well-controlled. Target (the "objective"): A1c
+            6.5-7.5% - in CDA this has no separate field; see the FHIR mirror,
+            where it is Goal.target. Here the goal records the qualitative aim.</text>
           <entry>
-            <!-- GOAL: the clinical AIM, qualitative (value = a state) -->
+            <!-- GOAL: a SINGLE Goal Observation using only HL7 fields.
+                 code = what the goal is about; value = the goal state (the aim).
+                 NOTE: HL7 defines no separate "objective" record. The measurable
+                 target ("objective" = A1c 6.5-7.5%) is Goal.target in FHIR; a CDA
+                 Goal Observation has only code+value, so it cannot carry the
+                 qualitative aim AND a separate measurable target at once. We do
+                 NOT invent a nested objective. -->
             <observation classCode="OBS" moodCode="GOL">
               <id root="2.16.840.1.113883.19.5.99999.10" extension="GOAL-1"/>
               <code code="408907000" codeSystem="2.16.840.1.113883.6.96"
                     codeSystemName="SNOMED CT" displayName="Diabetes mellitus control"/>
               <statusCode code="active"/>
+              <effectiveTime><low value="20260608"/><high value="20261208"/></effectiveTime>
               <value xsi:type="CD" code="412776001"
                      codeSystem="2.16.840.1.113883.6.96"
                      displayName="Well controlled"/>
-
-              <!-- OBJECTIVE: the measurable range, COMPONENT of the goal -->
-              <entryRelationship typeCode="COMP">
-                <observation classCode="OBS" moodCode="GOL">
-                  <id root="2.16.840.1.113883.19.5.99999.11" extension="OBJ-1"/>
-                  <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
-                        displayName="Hemoglobin A1c"/>
-                  <statusCode code="active"/>
-                  <!-- a RANGE, not a single threshold: this is maintenance -->
-                  <value xsi:type="IVL_PQ">
-                    <low value="6.5" unit="%"/>
-                    <high value="7.5" unit="%"/>
-                  </value>
-                </observation>
-              </entryRelationship>
             </observation>
           </entry>
         </section>
