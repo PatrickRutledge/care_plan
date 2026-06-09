@@ -23,6 +23,7 @@ every workflow realizes.
 | File | What it gives you |
 |---|---|
 | [`clinical-process.md`](clinical-process.md) | **The spine.** The clinical care-planning cycle, the temporal dependency graph, and the goal→service→evaluation intent. **Start here.** |
+| [`discovery-summary.md`](discovery-summary.md) | **End-of-phase-1 synthesis.** What the discovery established, what robustness was proven, and the open questions for the next phase. |
 | [`process-map.md`](process-map.md) | BPMN-style swimlane spec for WF1 + WF2. Each step names its data object + state transition. |
 | [`wf3-followup-evaluate.md`](wf3-followup-evaluate.md) | WF3 process map: monitor → evaluate → revise, with the revise-vs-close decision gateway. |
 | [`wf4-assess-identify.md`](wf4-assess-identify.md) | WF4 process map: assess → identify problem → set goal. The start of the arc and the justification root. |
