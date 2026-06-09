@@ -34,8 +34,8 @@ every workflow realizes.
 | [`wf4-assess-identify.md`](wf4-assess-identify.md) | WF4 process map: assess → identify problem → set goal. The start of the arc and the justification root. |
 | [`wf5-referral-handoff.md`](wf5-referral-handoff.md) | WF5 process map: external referral with closed-loop reporting (CHI/community hand-off). |
 | [`state-machine.md`](state-machine.md) | Mermaid diagrams of the `moodCode` / `statusCode` state machine (renders on GitHub). |
-| [`careplan-establish.ccda.xml`](careplan-establish.ccda.xml) | **Conformant C-CDA** Care Plan (WF1) — real C-CDA templateIds, the Health Concerns / Goals / Interventions sections, Goal Observation + Planned Intervention + Entry Reference. The template the other workflows re-anchor to. |
-| [`careplan-example.xml`](careplan-example.xml) | The original **base-CDA** WF1 instance (kept to show grammar-vs-conformant difference). Superseded by the `.ccda.xml` version above. |
+| **`*.ccda.xml` (the conformant set)** | **All five workflows re-anchored to conformant C-CDA** with verified templateIds: `careplan-establish` (WF1), `careplan-complete` (WF2), `careplan-followup` (WF3, adds the Outcomes Section + `GEVL` goal-evaluation link), `careplan-assess` (WF4), `careplan-referral` (WF5). Each: Health Concerns + Goals (SHALL) + the workflow's section; schema-valid + rendered. |
+| [`careplan-example.xml`](careplan-example.xml) etc. | The original **base-CDA** instances (kept to show the grammar-vs-conformant difference). Superseded by the matching `.ccda.xml` versions. |
 | [`careplan-example.rendered.html`](careplan-example.rendered.html) | The CDA instance run through the HL7 CDA stylesheet — the human-readable, attestable view. Open in a browser. |
 | [`careplan-example.fhir.json`](careplan-example.fhir.json) | FHIR R4 mirror of the same plan (Patient, CareTeam, Goal, CarePlan, 2 Tasks) — the live-workflow representation. |
 | [`cda-to-fhir-mapping.md`](cda-to-fhir-mapping.md) | The Rosetta-stone table: same data atoms, CDA column vs. FHIR column. |

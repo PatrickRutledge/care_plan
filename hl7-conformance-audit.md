@@ -78,13 +78,17 @@ narrative leaned on it.
    were added illustratively and **not verified** against the C-CDA Implementation
    Guide. They do **not** affect base-CDA schema validity (a `templateId` is just
    an `II`), but a wrong one is misleading.
-   *Status: in progress.* **WF1 re-anchored** in `careplan-establish.ccda.xml`
-   using **verified** C-CDA templateIds (Care Plan `…1.15`, Health Concerns
-   `…2.58`, Goals `…2.60`, Interventions `…21.2.3`, Goal Observation `…4.121`,
-   Planned Intervention `…4.146`, Entry Reference `…4.122`), confirmed against
-   HL7's published C-CDA template registry and Goal Observation example. WF2–WF5
-   to follow this template. *Note:* validation is base-CDA XSD; full C-CDA
-   conformance also needs Schematron (a separate step not run here).
+   *Status: RESOLVED for all five workflows.* Re-anchored to conformant C-CDA
+   using **verified** templateIds (confirmed against HL7's published C-CDA
+   template registry + Goal Observation / Outcome Observation examples):
+   Care Plan `…1.15`, Health Concerns `…2.58`, Goals `…2.60`, Interventions
+   `…21.2.3`, Health Status Evaluations & Outcomes `…2.61`, Health Concern Act
+   `…4.132`, Goal Observation `…4.121`, Outcome Observation `…4.144`,
+   Intervention Act `…4.131`, Planned Intervention `…4.146`, Entry Reference
+   `…4.122`. Files: `careplan-{establish,complete,followup,assess,referral}.ccda.xml`,
+   all schema-valid + rendered. WF3 uses the purpose-built `GEVL` goal-evaluation
+   link for outcomes. *Note:* validation is base-CDA XSD; full C-CDA conformance
+   also needs Schematron (a separate step not run here).
 
 3. **Goal-as-measurable-target in WF1 / WF3 / WF4.** Those earlier examples set
    the goal as an A1c value/threshold (`code` = A1c, `value` = 7.0%) — the C-CDA
@@ -126,7 +130,7 @@ apart in your head matches the data as it actually is.
 |---|---|
 | Example provenance documented | ✅ |
 | Relationship codes verified | ✅ (RSON, SPRT, FLFS, COMP correct) |
-| `REFR` overstatement | ⬜ correcting in docs (centerpiece done first) |
+| `REFR` overstatement | ⬜ centerpiece corrected; sweep of remaining docs pending |
 | Patient-as-performer | ⬜ flagged, fix proposed |
-| templateIds | ⬜ flagged, verify-or-remove |
-| Goal/objective consistency pass (WF1/3/4) | ⬜ flagged |
+| templateIds | ✅ resolved — all five workflows re-anchored to verified C-CDA templateIds |
+| Goal/objective consistency pass (WF1/3/4) | ✅ in the `.ccda.xml` set, goals use the C-CDA Goal Observation form uniformly (code=measure, value=target) |
