@@ -55,12 +55,17 @@ frameworks. That is now done.
 
 ## Open questions to carry into the next phase
 
-1. **The CDA↔FHIR adapter gap (recurring).** CDA's `act → goal` `REFR` ("serves
-   this goal") link is *stronger* than R4's, which routes goal linkage through
-   `CarePlan.goal` / `supportingInfo`. Conversely FHIR's `Goal.achievementStatus`
-   is *more expressive* than CDA's goal `statusCode`. The future adapter layer
-   must normalize "which goal does this service serve?" and "what is the goal's
-   achievement state?" across both. (Documented in WF3 and WF5.)
+1. **The CDA↔FHIR adapter gap (recurring).** CDA carries an inline
+   `entryRelationship REFR` from the act to the goal — *granular* (which act →
+   which goal) but semantically generic ("refers to"). FHIR has **no first-class
+   per-service goal link** for Task/ServiceRequest-based plans (the explicit
+   `CarePlan.activity.detail.goal` is inline-only, R4-only, removed in R5); goal
+   linkage is **plan-level** (`CarePlan.goal`). So the two differ in *where* the
+   link lives, not simply in strength. Conversely FHIR's `Goal.achievementStatus`
+   is *more expressive* than CDA's goal `statusCode`. The adapter must reconstruct
+   "which goal does this service serve?" and normalize achievement state across
+   both. (Verified 2026-06-09 against FHIR R4/R5; documented in WF3, WF5,
+   `cda-to-fhir-mapping.md`.)
 2. **Static vs. dynamic care plans.** These artifacts model the care plan as a
    persistent, attestable *snapshot* (CDA's nature). A future direction is a
    *dynamic* care plan with a lifetime, hosted on a registry — to be examined in

@@ -59,5 +59,15 @@ literally built from the outcome (A1C-1) and the goal (G1) of this round.
 
 FHIR's `Goal.achievementStatus` is actually *more expressive* than CDA here
 (it has a dedicated value set: improving, worsening, not-achieved, achieved…).
-CDA's act→goal `REFR` "serves" link is *stronger* than R4 Task's goal linkage.
-Both gaps are noted so the adapter layer can normalize them later.
+
+On the **service→goal** row, the precise picture (verified 2026-06-09, external
+audit + spec check): CDA always carries an inline `entryRelationship REFR` from
+the act to the goal — *granular* (which act → which goal) but semantically
+generic ("refers to"). FHIR's explicit per-activity goal element
+(`CarePlan.activity.detail.goal`) exists **only for inline activities, R4 only**
+(removed in R5) and is mutually exclusive with referencing a `Task`. For
+**Task-based** plans (ours), FHIR has **no per-task goal link** in R4 or R5 — goal
+linkage is **plan-level** (`CarePlan.goal`). So neither is simply "stronger": CDA
+is more granular, FHIR's plan-level link is explicit but coarser. The adapter must
+reconstruct per-service→goal intent for FHIR. (Earlier wording here called CDA
+"stronger" — too blunt; this is the corrected, version-aware statement.)

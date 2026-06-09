@@ -55,6 +55,16 @@ SUB   CarePlan / Goal /   the REQUEST/INSTANCE layer — this patient's plan,
 INST  live resources      updated continuously via the API
 ```
 
+> **Version watch (verified 2026-06-09).** FHIR is still moving, and a care-plan
+> detail changed between releases: **R4** `CarePlan.activity` could carry an inline
+> `activity.detail.goal` (an explicit per-activity→goal link); **R5 deleted
+> `activity.detail` entirely** (replaced by `plannedActivityReference`), so in R5
+> goal linkage is **plan-level only** (`CarePlan.goal`). Practical effect: there is
+> **no first-class per-task→goal link** when activities are Task/ServiceRequest
+> resources, in R4 *or* R5. Building on "the most extensive spec" means tracking
+> these shifts — the adapter must reconstruct per-service→goal intent itself, and
+> not assume `activity.detail.goal` is available.
+
 The crucial FHIR insight: **`PlanDefinition` → `CarePlan` is "template →
 instance."** You author the care-plan logic *once* as a `PlanDefinition` (with
 `ActivityDefinition`s for each action), host it on a registry, and *instantiate*

@@ -13,24 +13,31 @@ transitions are the contract that does not break.
 
 ## 1. The `moodCode` lifecycle of a single task
 
-The same act (same `code`, same `id`) is walked from "requested" to "happened".
-That walk **is** task completion — independent of any UI.
+> **Teaching abstraction — not literal HL7.** In HL7, `moodCode` is a *fixed
+> attribute* of an act; an act does **not** change its mood. A request (`RQO`)
+> and the event that fulfills it (`EVN`) are **separate acts**, linked by
+> `FLFS`/`inFulfillmentOf`. The diagram below shows the *progression of moods
+> across distinct, linked acts* — a useful way to picture the lifecycle, but read
+> it as "different acts in different moods, reconciled by id," not "one act
+> walking through states." Our examples model it correctly: completion is a new
+> `EVN` act referencing the original `RQO`. (Confirmed against HL7 ActMood;
+> external audit, 2026-06-09.)
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PRP: proposed (moodCode=PRP)
-    PRP --> INT: accepted into plan (moodCode=INT)
-    INT --> RQO: assigned / ordered (moodCode=RQO)
-    RQO --> EVN: performed (moodCode=EVN)
+    [*] --> PRP: proposed act (moodCode=PRP)
+    PRP --> INT: accepted — new INT act
+    INT --> RQO: ordered — new RQO act
+    RQO --> EVN: performed — new EVN act, inFulfillmentOf the RQO
     EVN --> [*]
 
     note right of RQO
-        RQO = the open task (an order)
+        RQO = the open order (one act)
         carries performer, due window, priority
     end note
     note right of EVN
-        EVN = the done event
-        links back via inFulfillmentOf
+        EVN = a SEPARATE done act
+        reconciled to the RQO by id via inFulfillmentOf
     end note
 ```
 

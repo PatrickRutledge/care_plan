@@ -59,10 +59,14 @@ without new process logic.
 | Referred-by | `participant typeCode=REFB` | `ServiceRequest.requester` |
 | Referred-to (external) | `participant typeCode=REFT` + external `representedOrganization` | `ServiceRequest.performer → Organization` |
 | Reason (social need) | `entryRelationship typeCode=RSON` | `ServiceRequest.reasonReference → Condition` |
-| Serves the goal | `entryRelationship typeCode=REFR` (→ GOL) | `ServiceRequest.supportingInfo → Goal` (weaker; via CarePlan) |
-| Loop closure | `act EVN` + `sdtc:inFulfillmentOf1` | `Task` `basedOn` ServiceRequest, `status=completed` |
+| Serves the goal | `entryRelationship typeCode=REFR` (→ GOL) | **plan-level `CarePlan.goal`** (no per-service goal field; see note) |
+| Loop closure | `act EVN` + Entry Reference to the planned act (`.ccda`) | `Task` `basedOn` ServiceRequest, `status=completed` |
 | External report | `reference → externalDocument` | `Task.output → DocumentReference` |
 
-Note the same recurring asymmetry: CDA's `REFR` "serves the goal" link is direct;
-FHIR routes goal linkage through `CarePlan`/`supportingInfo`. The adapter layer
-should normalize "which goal does this referral serve?" across both.
+Note the recurring asymmetry, stated precisely (verified 2026-06-09): CDA carries
+an inline `REFR` from the act to the goal — granular but generic. FHIR has **no
+first-class per-service goal link** when activities are Task/ServiceRequest
+resources (and `activity.detail.goal` was R4-only, removed in R5); goal linkage is
+**plan-level** (`CarePlan.goal`). Using `ServiceRequest.supportingInfo` for it was
+a workaround and has been dropped. The adapter must reconstruct "which goal does
+this referral serve?" for FHIR.

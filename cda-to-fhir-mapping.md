@@ -15,8 +15,8 @@ serialization of those concepts.
 | A task (assigned) | `act moodCode="RQO"` | `Task` `intent=order` |
 | Task identity (the thread) | `act/id` | `Task.identifier` / `Task.id` |
 | Task lifecycle state | `moodCode` + `statusCode` | `Task.status` |
-| Task is part of the plan | `entryRelationship` / section membership | `Task.basedOn → CarePlan` |
-| Task serves the goal | `entryRelationship typeCode="REFR"` → goal | `Task.reasonReference → Goal` |
+| Task is part of the plan | `entryRelationship` / section membership | `CarePlan.activity.reference → Task` (idiomatic) |
+| Task serves the goal | `entryRelationship typeCode="REFR"` → goal | **plan-level `CarePlan.goal`** — see note below |
 | Who performs it | `performer typeCode="PRF"` | `Task.owner` |
 | Who requested it | `author` / requester | `Task.requester` |
 | Who it's for | `subject` | `Task.for` |
@@ -28,6 +28,27 @@ serialization of those concepts.
 | Referral to external | `participant typeCode="REFT"` | `CareTeam` member `onBehalfOf` external org |
 | Sign-off / attestation | `legalAuthenticator` | `Provenance` (separate resource) |
 | Plan revision | `relatedDocument typeCode="RPLC"` | `CarePlan.replaces` |
+
+## Note: "serves the goal" has no first-class per-task field in FHIR
+
+This row was corrected after an external audit + a spec check (2026-06-09):
+
+- `Task.reasonReference` is **"why the task is needed"** (the reason/condition) —
+  *not* the goal the task contributes toward. Mapping "serves the goal" to it was
+  a mismatch.
+- FHIR's explicit per-activity→goal element, `CarePlan.activity.detail.goal`,
+  **only exists for inline activities** and is mutually exclusive with
+  `activity.reference → Task` (R4 constraint **cpl-3**: reference *or* detail, not
+  both). It was also **removed entirely in R5**.
+- So when activities are modeled as **Task/ServiceRequest resources** (as here),
+  there is **no first-class per-task goal link** in FHIR R4 *or* R5. Goal linkage
+  is **plan-level** (`CarePlan.goal`): the plan declares its goals and its
+  activities, but does not say *which* task serves *which* goal.
+- **CDA, by contrast, always carries an inline `entryRelationship REFR` from the
+  act to the goal** — weaker semantically (generic "refers to") but more
+  *granular* (it says which act points at which goal). Neither is strictly
+  "stronger"; they put the link in different places. The adapter must reconstruct
+  per-service→goal intent for FHIR Task-based plans.
 
 ## The one genuinely different mechanic — task completion
 

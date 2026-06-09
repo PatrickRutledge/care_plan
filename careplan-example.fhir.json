@@ -134,7 +134,7 @@
         "for": { "reference": "Patient/PT-12345" },
         "owner": { "reference": "Practitioner/RN-7" },
         "requester": { "reference": "Practitioner/RN-7" },
-        "reasonReference": { "reference": "Goal/G1" },
+        "_comment_goal": "Serves Goal/G1 — goal linkage is PLAN-LEVEL via CarePlan.goal. FHIR has no per-Task goal field; reasonReference would mean the *reason* (e.g. a Condition), not the goal served. Removed the reasonReference->Goal mismatch 2026-06-09.",
         "executionPeriod": { "start": "2026-06-10", "end": "2026-06-12T14:30:00-05:00" },
         "lastModified": "2026-06-12T14:30:00-05:00"
       }
@@ -155,7 +155,7 @@
         "for": { "reference": "Patient/PT-12345" },
         "owner": { "reference": "Practitioner/MD-EYE-2" },
         "requester": { "reference": "Practitioner/RN-7" },
-        "reasonReference": { "reference": "Goal/G1" },
+        "_comment_goal": "Serves Goal/G1 — goal linkage is PLAN-LEVEL via CarePlan.goal. FHIR has no per-Task goal field; reasonReference would mean the *reason* (e.g. a Condition), not the goal served. Removed the reasonReference->Goal mismatch 2026-06-09.",
         "restriction": { "period": { "start": "2026-06-10", "end": "2026-07-10" } }
       }
     }
