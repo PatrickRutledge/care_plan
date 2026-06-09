@@ -23,7 +23,8 @@ every workflow realizes.
 | File | What it gives you |
 |---|---|
 | [`clinical-process.md`](clinical-process.md) | **The spine.** The clinical care-planning cycle, the temporal dependency graph, and the goal→service→evaluation intent. **Start here.** |
-| [`process-map.md`](process-map.md) | BPMN-style swimlane spec. Each step names its data object + state transition. |
+| [`process-map.md`](process-map.md) | BPMN-style swimlane spec for WF1 + WF2. Each step names its data object + state transition. |
+| [`wf3-followup-evaluate.md`](wf3-followup-evaluate.md) | WF3 process map: monitor → evaluate → revise, with the revise-vs-close decision gateway. |
 | [`state-machine.md`](state-machine.md) | Mermaid diagrams of the `moodCode` / `statusCode` state machine (renders on GitHub). |
 | [`careplan-example.xml`](careplan-example.xml) | A concrete, **schema-valid** CDA Care Plan instance: 1 goal, 1 internal task, 1 external task, 1 completion event. |
 | [`careplan-example.rendered.html`](careplan-example.rendered.html) | The CDA instance run through the HL7 CDA stylesheet — the human-readable, attestable view. Open in a browser. |
@@ -60,6 +61,12 @@ every workflow realizes.
    Completion = a *new* `act moodCode="EVN"`, `statusCode="completed"`, tied back
    to the order by `sdtc:inFulfillmentOf1`. Additive, not destructive — any
    system in any order can produce it and it still reconciles by `id`.
+
+3. **Follow-up & evaluate (WF3).** Measure the outcome (`observation moodCode="EVN"`
+   value), compare to the goal target, then **close** (goal met) or **re-direct**
+   (new `act moodCode="RQO"` linked `REFR`→goal and `RSON`→outcome). The
+   re-direct-vs-close branch is a data comparison, not a UI rule. See
+   [`wf3-followup-evaluate.md`](wf3-followup-evaluate.md).
 
 ## The stability guarantee
 

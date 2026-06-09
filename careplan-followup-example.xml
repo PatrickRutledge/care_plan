@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  SAMPLE CDA R2.0 CARE-PLAN FOLLOW-UP / EVALUATION  (WF3, reference instance)
+  ============================================================================
+  This is the temporal SUCCESSOR to careplan-example.xml. It demonstrates
+  cycle phases 6-8 (Monitor -> Evaluate -> Revise) from clinical-process.md.
+
+  The clinical story it encodes:
+    - Original plan set GOAL G1: A1c < 7.0% (see careplan-example.xml).
+    - Original education task T1 was completed (WF2).
+    - At follow-up, A1c is MEASURED = 7.8%  -> goal NOT yet met.
+    - Because of that gap, a NEW service T3 (pharmacologic intensification)
+      is DIRECTED, justified by:
+          REFR -> the goal it serves (G1)
+          RSON -> the outcome that triggered it (the 7.8% result)
+    - Goal G1 stays  statusCode="active"  (not achieved).
+
+  The INTENTIONAL LOOP, made into data:
+        GOAL G1  =[REFR]=  outcome obs (7.8%)   [evaluate]
+        GOAL G1  =[REFR]=  new task T3          [re-direct service]
+        outcome  =[RSON]=  new task T3          [the WHY of T3]
+
+  This document APPENDs to the original plan (relatedDocument typeCode="APND").
+  ============================================================================
+-->
+<ClinicalDocument xmlns="urn:hl7-org:v3"
+                  xmlns:sdtc="urn:hl7-org:sdtc"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <realmCode code="US"/>
+  <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
+  <templateId root="2.16.840.1.113883.10.20.22.1.9" extension="2015-08-01"/>
+  <id root="2.16.840.1.113883.19.5.99999.1" extension="CarePlan-0001-FU1"/>
+  <code code="11506-3" codeSystem="2.16.840.1.113883.6.1"
+        codeSystemName="LOINC" displayName="Progress note"/>
+  <title>Care Plan Follow-up - Jane Q. Patient</title>
+  <effectiveTime value="20260910100000-0500"/>
+  <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
+  <languageCode code="en-US"/>
+
+  <recordTarget>
+    <patientRole>
+      <id root="2.16.840.1.113883.19.5.99999.2" extension="PT-12345"/>
+      <patient>
+        <name><given>Jane</given><family>Patient</family></name>
+        <administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"/>
+        <birthTime value="19600101"/>
+      </patient>
+    </patientRole>
+  </recordTarget>
+
+  <author>
+    <time value="20260910100000-0500"/>
+    <assignedAuthor>
+      <id root="2.16.840.1.113883.19.5.99999.3" extension="RN-7"/>
+      <assignedPerson>
+        <name><given>Nora</given><family>Nurse</family></name>
+      </assignedPerson>
+      <representedOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+        <name>Internal Primary Care Clinic</name>
+      </representedOrganization>
+    </assignedAuthor>
+  </author>
+
+  <custodian>
+    <assignedCustodian>
+      <representedCustodianOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+        <name>Internal Primary Care Clinic</name>
+      </representedCustodianOrganization>
+    </assignedCustodian>
+  </custodian>
+
+  <legalAuthenticator>
+    <time value="20260910101500-0500"/>
+    <signatureCode code="S"/>
+    <assignedEntity>
+      <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+      <representedOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+      </representedOrganization>
+    </assignedEntity>
+  </legalAuthenticator>
+
+  <!-- TEMPORAL LINK: this note appends to the original care plan document -->
+  <relatedDocument typeCode="APND">
+    <parentDocument>
+      <id root="2.16.840.1.113883.19.5.99999.1" extension="CarePlan-0001"/>
+      <code code="18776-5" codeSystem="2.16.840.1.113883.6.1"
+            displayName="Plan of care note"/>
+    </parentDocument>
+  </relatedDocument>
+
+  <component>
+    <structuredBody>
+
+      <!-- ===== PHASE 6: MONITOR - the follow-up encounter ===== -->
+      <component>
+        <section>
+          <code code="46240-8" codeSystem="2.16.840.1.113883.6.1"
+                displayName="History of encounters"/>
+          <title>Follow-up Encounter</title>
+          <text>Diabetes follow-up visit on 2026-09-10. Reviewed progress
+            against care plan goal (A1c &lt; 7.0%).</text>
+          <entry>
+            <encounter classCode="ENC" moodCode="EVN">
+              <id root="2.16.840.1.113883.19.5.99999.30" extension="E1"/>
+              <code code="390906007" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Follow-up encounter"/>
+              <statusCode code="completed"/>
+              <effectiveTime value="20260910"/>
+            </encounter>
+          </entry>
+        </section>
+      </component>
+
+      <!-- ===== PHASE 7: EVALUATE - measured outcome vs. goal target ===== -->
+      <component>
+        <section>
+          <code code="30954-2" codeSystem="2.16.840.1.113883.6.1"
+                displayName="Relevant diagnostic tests and/or laboratory data"/>
+          <title>Results</title>
+          <text>Hemoglobin A1c = 7.8% (High). Goal is &lt; 7.0%; goal not yet met.</text>
+          <entry>
+            <!-- The OUTCOME: an EVN observation carrying the measured value -->
+            <observation classCode="OBS" moodCode="EVN">
+              <id root="2.16.840.1.113883.19.5.99999.31" extension="A1C-1"/>
+              <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                    displayName="Hemoglobin A1c"/>
+              <statusCode code="completed"/>
+              <effectiveTime value="20260909"/>
+              <value xsi:type="PQ" value="7.8" unit="%"/>
+              <interpretationCode code="H" codeSystem="2.16.840.1.113883.5.83"
+                                  displayName="High"/>
+              <!-- This result MEASURES goal G1 (REFR -> the goal) -->
+              <entryRelationship typeCode="REFR">
+                <observation classCode="OBS" moodCode="GOL">
+                  <id root="2.16.840.1.113883.19.5.99999.10" extension="G1"/>
+                  <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                        displayName="Hemoglobin A1c"/>
+                  <value xsi:type="PQ" value="7.0" unit="%"/>
+                </observation>
+              </entryRelationship>
+            </observation>
+          </entry>
+        </section>
+      </component>
+
+      <!-- ===== GOAL STATUS - still active because target not met ===== -->
+      <component>
+        <section>
+          <code code="61146-7" codeSystem="2.16.840.1.113883.6.1"
+                displayName="Goals"/>
+          <title>Goals</title>
+          <text>A1c &lt; 7.0% within 6 months - status: ACTIVE (not yet achieved;
+            current 7.8%).</text>
+          <entry>
+            <observation classCode="OBS" moodCode="GOL">
+              <id root="2.16.840.1.113883.19.5.99999.10" extension="G1"/>
+              <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                    displayName="Hemoglobin A1c"/>
+              <statusCode code="active"/>
+              <effectiveTime>
+                <low value="20260608"/>
+                <high value="20261208"/>
+              </effectiveTime>
+              <value xsi:type="PQ" value="7.0" unit="%"/>
+            </observation>
+          </entry>
+        </section>
+      </component>
+
+      <!-- ===== PHASE 8: REVISE - a NEW service directed by the gap ===== -->
+      <component>
+        <section>
+          <code code="18776-5" codeSystem="2.16.840.1.113883.6.1"
+                displayName="Plan of care note"/>
+          <title>Revised Plan</title>
+          <text>Because A1c remains above goal, initiate pharmacologic therapy
+            management (T3). Continue toward the existing A1c goal.</text>
+          <entry>
+            <!-- NEW directed service. RQO = an assigned task. -->
+            <act classCode="ACT" moodCode="RQO">
+              <id root="2.16.840.1.113883.19.5.99999.20" extension="T3"/>
+              <code code="386359008" codeSystem="2.16.840.1.113883.6.96"
+                    codeSystemName="SNOMED CT" displayName="Medication management"/>
+              <text>Initiate/adjust pharmacologic therapy for glycemic control</text>
+              <statusCode code="active"/>
+              <effectiveTime>
+                <low value="20260910"/>
+                <high value="20261010"/>
+              </effectiveTime>
+              <priorityCode code="R" codeSystem="2.16.840.1.113883.5.7"
+                            displayName="routine"/>
+
+              <performer typeCode="PRF">
+                <assignedEntity>
+                  <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+                  <representedOrganization>
+                    <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+                    <name>Internal Primary Care Clinic</name>
+                  </representedOrganization>
+                </assignedEntity>
+              </performer>
+
+              <!-- INTENT: this service serves goal G1 (REFR) -->
+              <entryRelationship typeCode="REFR">
+                <observation classCode="OBS" moodCode="GOL">
+                  <id root="2.16.840.1.113883.19.5.99999.10" extension="G1"/>
+                  <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                        displayName="Hemoglobin A1c"/>
+                </observation>
+              </entryRelationship>
+
+              <!-- WHY: this service is BECAUSE OF the 7.8% outcome (RSON) -->
+              <entryRelationship typeCode="RSON">
+                <observation classCode="OBS" moodCode="EVN">
+                  <id root="2.16.840.1.113883.19.5.99999.31" extension="A1C-1"/>
+                  <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                        displayName="Hemoglobin A1c"/>
+                </observation>
+              </entryRelationship>
+            </act>
+          </entry>
+        </section>
+      </component>
+
+    </structuredBody>
+  </component>
+</ClinicalDocument>
