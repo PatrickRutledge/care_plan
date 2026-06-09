@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  SAMPLE CDA R2.0 ASSESSMENT & PROBLEM IDENTIFICATION  (WF4, reference instance)
+  ============================================================================
+  This is the temporal PREDECESSOR to careplan-example.xml. It demonstrates
+  cycle phases 1-2 (Assess -> Identify problem) from clinical-process.md, and
+  shows the hand-off to WF1 (problem -> goal).
+
+  The clinical story it encodes:
+    - Assessment collects baseline data: A1c = 9.2% (High), BMI = 32.
+    - From that data a PROBLEM is identified: Type 2 diabetes mellitus.
+    - A GOAL (G1: A1c < 7.0%) is set that ADDRESSES that problem.
+    - (WF1 then attaches services that serve G1.)
+
+  The INTENTIONAL CHAIN, made into data (front of the arc):
+        assessment obs (A1c 9.2%)  =[SUBJ]=  problem observation
+        problem concern act         wraps     problem observation
+        GOAL G1                     =[RSON]=  problem  (goal exists BECAUSE of problem)
+
+  This is the justification root: every downstream goal and service can be
+  traced back to THIS problem, which is itself grounded in measured data.
+  ============================================================================
+-->
+<ClinicalDocument xmlns="urn:hl7-org:v3"
+                  xmlns:sdtc="urn:hl7-org:sdtc"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <realmCode code="US"/>
+  <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
+  <templateId root="2.16.840.1.113883.10.20.22.1.4" extension="2015-08-01"/>
+  <id root="2.16.840.1.113883.19.5.99999.1" extension="Assessment-0001"/>
+  <code code="51848-0" codeSystem="2.16.840.1.113883.6.1"
+        codeSystemName="LOINC" displayName="Evaluation note"/>
+  <title>Initial Assessment - Jane Q. Patient</title>
+  <effectiveTime value="20260601100000-0500"/>
+  <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25"/>
+  <languageCode code="en-US"/>
+
+  <recordTarget>
+    <patientRole>
+      <id root="2.16.840.1.113883.19.5.99999.2" extension="PT-12345"/>
+      <patient>
+        <name><given>Jane</given><family>Patient</family></name>
+        <administrativeGenderCode code="F" codeSystem="2.16.840.1.113883.5.1"/>
+        <birthTime value="19600101"/>
+      </patient>
+    </patientRole>
+  </recordTarget>
+
+  <author>
+    <time value="20260601100000-0500"/>
+    <assignedAuthor>
+      <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+      <assignedPerson>
+        <name><given>Alan</given><family>Author</family></name>
+      </assignedPerson>
+      <representedOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+        <name>Internal Primary Care Clinic</name>
+      </representedOrganization>
+    </assignedAuthor>
+  </author>
+
+  <custodian>
+    <assignedCustodian>
+      <representedCustodianOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+        <name>Internal Primary Care Clinic</name>
+      </representedCustodianOrganization>
+    </assignedCustodian>
+  </custodian>
+
+  <legalAuthenticator>
+    <time value="20260601101500-0500"/>
+    <signatureCode code="S"/>
+    <assignedEntity>
+      <id root="2.16.840.1.113883.19.5.99999.3" extension="DR-1"/>
+      <representedOrganization>
+        <id root="2.16.840.1.113883.19.5.99999" extension="OUR-ORG"/>
+      </representedOrganization>
+    </assignedEntity>
+  </legalAuthenticator>
+
+  <component>
+    <structuredBody>
+
+      <!-- ===== PHASE 1: ASSESS - baseline measured data ===== -->
+      <component>
+        <section>
+          <code code="30954-2" codeSystem="2.16.840.1.113883.6.1"
+                displayName="Relevant diagnostic tests and/or laboratory data"/>
+          <title>Assessment Data</title>
+          <text>Baseline: Hemoglobin A1c = 9.2% (High). BMI = 32 kg/m2.</text>
+
+          <!-- Baseline A1c that reveals the problem -->
+          <entry>
+            <observation classCode="OBS" moodCode="EVN">
+              <id root="2.16.840.1.113883.19.5.99999.31" extension="A1C-0"/>
+              <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                    displayName="Hemoglobin A1c"/>
+              <statusCode code="completed"/>
+              <effectiveTime value="20260530"/>
+              <value xsi:type="PQ" value="9.2" unit="%"/>
+              <interpretationCode code="H" codeSystem="2.16.840.1.113883.5.83"
+                                  displayName="High"/>
+            </observation>
+          </entry>
+
+          <!-- Baseline BMI -->
+          <entry>
+            <observation classCode="OBS" moodCode="EVN">
+              <id root="2.16.840.1.113883.19.5.99999.32" extension="BMI-0"/>
+              <code code="39156-5" codeSystem="2.16.840.1.113883.6.1"
+                    displayName="Body mass index"/>
+              <statusCode code="completed"/>
+              <effectiveTime value="20260530"/>
+              <value xsi:type="PQ" value="32" unit="kg/m2"/>
+            </observation>
+          </entry>
+        </section>
+      </component>
+
+      <!-- ===== PHASE 2: IDENTIFY PROBLEM - the concern + diagnosis ===== -->
+      <component>
+        <section>
+          <code code="11450-4" codeSystem="2.16.840.1.113883.6.1"
+                displayName="Problem list"/>
+          <title>Problem List</title>
+          <text>Type 2 diabetes mellitus (active), supported by A1c 9.2%.</text>
+
+          <!-- Problem Concern Act wraps the problem observation -->
+          <entry>
+            <act classCode="ACT" moodCode="EVN">
+              <id root="2.16.840.1.113883.19.5.99999.40" extension="CONC-1"/>
+              <code code="75310-3" codeSystem="2.16.840.1.113883.6.1"
+                    displayName="Health concern"/>
+              <statusCode code="active"/>
+              <effectiveTime>
+                <low value="20260601"/>
+              </effectiveTime>
+
+              <!-- the problem itself (SUBJ = subject of the concern) -->
+              <entryRelationship typeCode="SUBJ">
+                <observation classCode="OBS" moodCode="EVN">
+                  <id root="2.16.840.1.113883.19.5.99999.41" extension="PROB-1"/>
+                  <code code="55607006" codeSystem="2.16.840.1.113883.6.96"
+                        codeSystemName="SNOMED CT" displayName="Problem"/>
+                  <statusCode code="completed"/>
+                  <effectiveTime>
+                    <low value="20260601"/>
+                  </effectiveTime>
+                  <value xsi:type="CD" code="44054006"
+                         codeSystem="2.16.840.1.113883.6.96"
+                         codeSystemName="SNOMED CT"
+                         displayName="Type 2 diabetes mellitus"/>
+
+                  <!-- this problem is SUPPORTED BY the A1c assessment (SPRT) -->
+                  <entryRelationship typeCode="SPRT">
+                    <observation classCode="OBS" moodCode="EVN">
+                      <id root="2.16.840.1.113883.19.5.99999.31" extension="A1C-0"/>
+                      <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                            displayName="Hemoglobin A1c"/>
+                    </observation>
+                  </entryRelationship>
+                </observation>
+              </entryRelationship>
+            </act>
+          </entry>
+        </section>
+      </component>
+
+      <!-- ===== HAND-OFF TO WF1: the goal that addresses the problem ===== -->
+      <component>
+        <section>
+          <code code="61146-7" codeSystem="2.16.840.1.113883.6.1"
+                displayName="Goals"/>
+          <title>Goals</title>
+          <text>Goal G1: lower A1c to &lt; 7.0% within 6 months, addressing the
+            Type 2 diabetes problem.</text>
+          <entry>
+            <observation classCode="OBS" moodCode="GOL">
+              <id root="2.16.840.1.113883.19.5.99999.10" extension="G1"/>
+              <code code="4548-4" codeSystem="2.16.840.1.113883.6.1"
+                    displayName="Hemoglobin A1c"/>
+              <statusCode code="active"/>
+              <effectiveTime>
+                <low value="20260608"/>
+                <high value="20261208"/>
+              </effectiveTime>
+              <value xsi:type="PQ" value="7.0" unit="%"/>
+
+              <!-- the goal exists BECAUSE OF the problem (RSON) -->
+              <entryRelationship typeCode="RSON">
+                <observation classCode="OBS" moodCode="EVN">
+                  <id root="2.16.840.1.113883.19.5.99999.41" extension="PROB-1"/>
+                  <code code="55607006" codeSystem="2.16.840.1.113883.6.96"
+                        codeSystemName="SNOMED CT" displayName="Problem"/>
+                  <value xsi:type="CD" code="44054006"
+                         codeSystem="2.16.840.1.113883.6.96"
+                         displayName="Type 2 diabetes mellitus"/>
+                </observation>
+              </entryRelationship>
+            </observation>
+          </entry>
+        </section>
+      </component>
+
+    </structuredBody>
+  </component>
+</ClinicalDocument>

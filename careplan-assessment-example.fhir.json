@@ -1,0 +1,75 @@
+{
+  "resourceType": "Bundle",
+  "id": "careplan-assessment-bundle",
+  "type": "transaction",
+  "_comment": "FHIR R4 mirror of careplan-assessment-example.xml (WF4: assess -> identify problem -> set goal). The front of the arc. CDA problem-concern-act+observation maps to FHIR Condition; assessment data to Observation; the goal-addresses-problem link to Goal.addresses.",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:obs-a1c0",
+      "request": { "method": "PUT", "url": "Observation/A1C-0" },
+      "resource": {
+        "resourceType": "Observation",
+        "id": "A1C-0",
+        "_comment": "Phase 1 Assess: baseline A1c that reveals the problem.",
+        "status": "final",
+        "category": [ { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "laboratory" } ] } ],
+        "code": { "coding": [ { "system": "http://loinc.org", "code": "4548-4", "display": "Hemoglobin A1c" } ] },
+        "subject": { "reference": "Patient/PT-12345" },
+        "effectiveDateTime": "2026-05-30",
+        "valueQuantity": { "value": 9.2, "unit": "%", "system": "http://unitsofmeasure.org", "code": "%" },
+        "interpretation": [ { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation", "code": "H", "display": "High" } ] } ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:obs-bmi0",
+      "request": { "method": "PUT", "url": "Observation/BMI-0" },
+      "resource": {
+        "resourceType": "Observation",
+        "id": "BMI-0",
+        "_comment": "Phase 1 Assess: baseline BMI.",
+        "status": "final",
+        "category": [ { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs" } ] } ],
+        "code": { "coding": [ { "system": "http://loinc.org", "code": "39156-5", "display": "Body mass index" } ] },
+        "subject": { "reference": "Patient/PT-12345" },
+        "effectiveDateTime": "2026-05-30",
+        "valueQuantity": { "value": 32, "unit": "kg/m2", "system": "http://unitsofmeasure.org", "code": "kg/m2" }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:cond-prob1",
+      "request": { "method": "PUT", "url": "Condition/PROB-1" },
+      "resource": {
+        "resourceType": "Condition",
+        "id": "PROB-1",
+        "_comment": "Phase 2 Identify: CDA problem-concern-act + problem observation -> FHIR Condition. clinicalStatus=active mirrors the concern statusCode=active. evidence.detail -> the supporting A1c (CDA SPRT link).",
+        "clinicalStatus": { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/condition-clinical", "code": "active" } ] },
+        "verificationStatus": { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status", "code": "confirmed" } ] },
+        "category": [ { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/condition-category", "code": "problem-list-item" } ] } ],
+        "code": { "coding": [ { "system": "http://snomed.info/sct", "code": "44054006", "display": "Type 2 diabetes mellitus" } ] },
+        "subject": { "reference": "Patient/PT-12345" },
+        "recordedDate": "2026-06-01",
+        "evidence": [ { "detail": [ { "reference": "Observation/A1C-0", "display": "A1c 9.2% (2026-05-30)" } ] } ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:goal-g1",
+      "request": { "method": "PUT", "url": "Goal/G1" },
+      "resource": {
+        "resourceType": "Goal",
+        "id": "G1",
+        "_comment": "Hand-off to WF1: the goal ADDRESSES the problem. CDA goal--RSON-->problem maps cleanly to FHIR Goal.addresses -> Condition. This is the justification root for every downstream service.",
+        "lifecycleStatus": "active",
+        "description": { "text": "Lower A1c to below 7.0% within 6 months" },
+        "subject": { "reference": "Patient/PT-12345" },
+        "target": [
+          {
+            "measure": { "coding": [ { "system": "http://loinc.org", "code": "4548-4", "display": "Hemoglobin A1c" } ] },
+            "detailQuantity": { "value": 7.0, "unit": "%", "comparator": "<" },
+            "dueDate": "2026-12-08"
+          }
+        ],
+        "addresses": [ { "reference": "Condition/PROB-1", "display": "Type 2 diabetes mellitus" } ]
+      }
+    }
+  ]
+}

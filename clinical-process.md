@@ -105,16 +105,17 @@ power of anchoring intent in the standard.
 
 | Workflow | Cycle phases | Status |
 |---|---|---|
+| **WF4 — Assess & identify problems** | 1 Assess, 2 Problem | ✅ built (feeds WF1) |
 | **WF1 — Establish care plan** | 3 Set goal, 4 Direct services, 5 Implement | ✅ built |
 | **WF2 — Complete tasks** | 5 Implement, 8 Close | ✅ built |
-| **WF3 — Follow-up & evaluate** | 6 Monitor, 7 Evaluate, 8 Revise | ⬜ next |
-| **WF4 — Assess & identify problems** | 1 Assess, 2 Problem | ⬜ planned (feeds WF1) |
-| **WF5 — Referral / external hand-off** | 4 Direct services (external) | ⬜ planned |
+| **WF3 — Follow-up & evaluate** | 6 Monitor, 7 Evaluate, 8 Revise | ✅ built |
+| **WF5 — Referral / external hand-off** | 4 Direct services (external) | ⬜ remaining |
 
-Build order follows clinical dependency, not difficulty: **WF3 (follow-up)** is
-next because it closes the loop and is where "intentional direction" is *tested*
-(did the services move the goal?). WF4 (assess) is the true clinical start but is
-modeled after WF1 because it feeds it and is the more open-ended phase.
+**All 8 cycle phases are now realized by at least one workflow.** The discovery
+process is complete end-to-end: assess (WF4) → set goal & direct services (WF1) →
+implement & complete (WF2) → monitor, evaluate, revise (WF3) → loop. WF5 (external
+referral) is a *variant* of phase-4 service direction, not a new phase — it can be
+added when the external-coordination detail is needed.
 
 ---
 

@@ -25,6 +25,7 @@ every workflow realizes.
 | [`clinical-process.md`](clinical-process.md) | **The spine.** The clinical care-planning cycle, the temporal dependency graph, and the goal→service→evaluation intent. **Start here.** |
 | [`process-map.md`](process-map.md) | BPMN-style swimlane spec for WF1 + WF2. Each step names its data object + state transition. |
 | [`wf3-followup-evaluate.md`](wf3-followup-evaluate.md) | WF3 process map: monitor → evaluate → revise, with the revise-vs-close decision gateway. |
+| [`wf4-assess-identify.md`](wf4-assess-identify.md) | WF4 process map: assess → identify problem → set goal. The start of the arc and the justification root. |
 | [`state-machine.md`](state-machine.md) | Mermaid diagrams of the `moodCode` / `statusCode` state machine (renders on GitHub). |
 | [`careplan-example.xml`](careplan-example.xml) | A concrete, **schema-valid** CDA Care Plan instance: 1 goal, 1 internal task, 1 external task, 1 completion event. |
 | [`careplan-example.rendered.html`](careplan-example.rendered.html) | The CDA instance run through the HL7 CDA stylesheet — the human-readable, attestable view. Open in a browser. |
